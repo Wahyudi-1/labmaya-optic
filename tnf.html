@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Fisika: Gelombang Cahaya</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Tema Gelombang Cahaya / Optik (Deep Purple & Neon Spectrum) */
+            --bg-primary: #0f0c29; /* Dark space */
+            --container-bg: #1a1a3a; /* Deep purple/blue */
+            --text-primary: #f8fafc; 
+            --text-secondary: #cbd5e1;
+            
+            --accent-cyan: #00f2fe; /* Neon Cyan (Blue light) */
+            --accent-blue: #8b5cf6; /* Violet/UV light */
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-yellow: #fcd34d; /* Yellow light */
+            
+            --border-color: #2e2e5e;
+            --card-bg: #23234d;
+        }
+
+        body { 
+            font-family: 'Inter', system-ui, sans-serif; 
+            background-color: var(--bg-primary); 
+            color: var(--text-primary); 
+            line-height: 1.6; 
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            justify-content: center; 
+            min-height: 100vh; 
+        }
+
+        .main-container { 
+            background: var(--container-bg); 
+            max-width: 900px; 
+            width: 100%; 
+            border-radius: 16px; 
+            box-shadow: 0 0 40px rgba(0, 242, 254, 0.15); 
+            padding: 2rem; 
+            box-sizing: border-box; 
+            border: 1px solid var(--border-color);
+        }
+
+        h1, h2 { 
+            color: var(--accent-cyan); 
+            text-align: center; 
+            font-family: 'Montserrat', sans-serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+        }
+
+        /* Form Styles */
+        .form-group { margin-bottom: 1.5rem; text-align: left; }
+        .form-label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--accent-cyan); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+        .form-input { 
+            width: 100%; 
+            padding: 1rem; 
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color); 
+            color: white;
+            border-radius: 8px; 
+            font-size: 1rem; 
+            box-sizing: border-box; 
+            transition: all 0.3s; 
+            font-family: 'Inter', sans-serif;
+        }
+        .form-input:focus { outline: none; border-color: var(--accent-cyan); box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
+
+        /* Button Styles */
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan)); 
+            color: white; 
+            border: none; 
+            padding: 1rem 2.5rem; 
+            font-size: 1.1rem; 
+            font-weight: bold; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            transition: transform 0.2s, box-shadow 0.2s; 
+            width: 100%;
+            font-family: 'Montserrat', sans-serif;
+            letter-spacing: 1px;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(0, 242, 254, 0.5); }
+
+        /* Quiz Header */
+        #quiz-area { display: none; }
+        .quiz-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 2rem; 
+            padding-bottom: 1rem; 
+            border-bottom: 1px solid var(--border-color); 
+            flex-wrap: wrap; 
+            gap: 1rem; 
+        }
+        .player-info { font-size: 0.9rem; color: var(--text-secondary); font-family: 'Inter', sans-serif; font-weight: bold; }
+        .badge { padding: 0.5rem 1rem; border-radius: 6px; font-weight: 700; font-size: 0.9rem; font-family: 'Montserrat', sans-serif; }
+        .progress-badge { background: rgba(139, 92, 246, 0.2); color: var(--accent-blue); border: 1px solid var(--accent-blue); }
+        .timer-badge { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); border: 1px solid var(--accent-red); transition: all 0.3s; }
+        
+        /* Question Cards */
+        .question-card { display: none; }
+        .question-card.active { display: block; animation: slideUp 0.5s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .stimulus-box { 
+            background: linear-gradient(to right, #2c2c63, #1a1a3a); 
+            border-left: 4px solid var(--accent-cyan); 
+            padding: 1.5rem; 
+            margin-bottom: 1.5rem; 
+            border-radius: 0 8px 8px 0; 
+            font-size: 1.05rem;
+            color: #f8fafc;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+        }
+
+        .statements-container { display: grid; gap: 1rem; }
+        .statement-item { 
+            background: var(--card-bg);
+            padding: 1.2rem; 
+            border: 1px solid var(--border-color); 
+            border-radius: 10px; 
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .statement-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; width: 100%; }
+        .statement-text { flex-grow: 1; font-weight: 500; }
+        
+        /* Buttons True/False */
+        .statement-buttons { display: flex; gap: 0.5rem; flex-shrink: 0; }
+        .tf-btn { 
+            width: 80px; 
+            padding: 0.6rem 0; 
+            font-weight: bold; 
+            border: 1px solid var(--border-color); 
+            border-radius: 6px; 
+            cursor: pointer; 
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.2s; 
+        }
+        
+        .tf-btn:hover:not(:disabled) { background: var(--border-color); color: white; }
+        
+        /* States */
+        .tf-btn.correct-selection { background-color: var(--accent-green) !important; color: #000 !important; border-color: var(--accent-green) !important; box-shadow: 0 0 10px var(--accent-green); }
+        .tf-btn.incorrect-selection { background-color: var(--accent-red) !important; color: white !important; border-color: var(--accent-red) !important; }
+        .tf-btn:disabled { cursor: not-allowed; opacity: 0.6; }
+
+        /* Explanation Box */
+        .explanation-box {
+            display: none;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--accent-green);
+            color: #a7f3d0;
+            padding: 0.8rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            animation: fadeIn 0.3s;
+        }
+        .explanation-box.wrong {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: var(--accent-red);
+            color: #fca5a5;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Navigation */
+        .quiz-nav { display: flex; justify-content: flex-end; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); }
+        .nav-btn { 
+            padding: 0.8rem 2rem; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            border: none; 
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--accent-green); 
+            color: #064e3b; 
+            transition: all 0.2s;
+        }
+        .nav-btn:hover:not(:disabled) { background-color: #34d399; box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+        .nav-btn:disabled { background-color: var(--border-color); color: var(--text-secondary); cursor: not-allowed; }
+
+        /* Results */
+        #result-screen { display: none; text-align: center; padding: 2rem 0; }
+        .score-circle { 
+            width: 160px; height: 160px; 
+            background: conic-gradient(var(--accent-cyan) var(--score-percent, 0%), var(--bg-primary) 0);
+            border-radius: 50%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            margin: 0 auto 2rem; 
+            position: relative;
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.3);
+        }
+        .score-circle::before {
+            content: ''; position: absolute; width: 140px; height: 140px; background: var(--container-bg); border-radius: 50%;
+        }
+        .score-content { position: relative; z-index: 2; display: flex; flex-direction: column; }
+        .score-value { font-size: 3.5rem; font-weight: 800; color: var(--accent-cyan); line-height: 1; font-family: 'Montserrat', sans-serif; }
+        .score-label { font-size: 0.9rem; color: var(--text-secondary); }
+
+        /* Leaderboard Styles */
+        .leaderboard-container { margin-top: 2rem; background: var(--bg-primary); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); text-align: left; }
+        .leaderboard-container h3 { text-align: center; color: var(--accent-cyan); margin-top: 0; font-family: 'Montserrat', sans-serif; }
+        .leaderboard-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+        .leaderboard-table th { padding: 10px 5px; border-bottom: 1px solid var(--border-color); color: var(--accent-blue); text-align: left; }
+        .leaderboard-table td { padding: 10px 5px; border-bottom: 1px solid var(--border-color); }
+
+        @media (max-width: 640px) { 
+            .main-container { padding: 1rem; border: none; background: transparent; box-shadow: none; }
+            .statement-row { flex-direction: column; align-items: flex-start; }
+            .statement-buttons { width: 100%; justify-content: space-between; }
+            .tf-btn { width: 48%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <div id="start-screen">
+        <h1>~ GELOMBANG CAHAYA ~</h1>
+        <p style="text-align: center; color: var(--text-secondary); margin-bottom: 2rem;">
+            Uji pemahaman analitismu tentang Gelombang Elektromagnetik, Optik Geometrik, dan Optik Fisis.
+            <br>Analisis setiap stimulus dan tentukan pernyataan tersebut <strong>TRUE (Benar)</strong> atau <strong>FALSE (Salah)</strong>.
+        </p>
+        
+        <div class="form-group">
+            <label class="form-label">Nama Lengkap</label>
+            <input type="text" id="player-name" class="form-input" placeholder="Masukkan nama lengkap" required>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Sekolah / Kelas</label>
+            <input type="text" id="player-school" class="form-input" placeholder="Masukkan asal sekolah / kelas" required>
+        </div>
+        <button onclick="startQuiz()" class="btn-primary">Mulai Kuis &rarr;</button>
+
+        <!-- Leaderboard -->
+        <div class="leaderboard-container">
+            <h3>🏆 Papan Peringkat Teratas</h3>
+            <table class="leaderboard-table">
+                <thead>
+                    <tr><th>Peringkat</th><th>Pemain</th><th>Skor</th></tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    <tr><td colspan="3" style="text-align: center; color: var(--text-secondary);">Menghubungkan ke server...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="quiz-area">
+        <div class="quiz-header">
+            <div class="player-info">PEMAIN: <strong id="display-name" style="color:var(--accent-cyan)">-</strong></div>
+            <div class="badge progress-badge">SOAL: <span id="current-q">1</span>/<span id="total-q">10</span></div>
+            <div class="badge timer-badge">WAKTU: <span id="timer-value">90</span>s</div>
+        </div>
+
+        <div id="questions-container"></div>
+
+        <div class="quiz-nav">
+            <button id="next-btn" class="nav-btn" disabled>Lanjut &rarr;</button>
+        </div>
+    </div>
+
+    <div id="result-screen">
+        <h2>ANALISIS SELESAI</h2>
+        <div class="score-circle" id="score-circle-el">
+            <div class="score-content">
+                <span class="score-value" id="final-score">0</span>
+                <span class="score-label">SKOR TOTAL</span>
+            </div>
+        </div>
+        
+        <div style="background: var(--bg-primary); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border: 1px solid var(--border-color);">
+            <p style="margin:0; color: var(--text-secondary);">Pemain: <strong id="result-name" style="color:white"></strong></p>
+            <p id="result-message" style="margin-top: 1rem; font-size: 1.1rem;"></p>
+            <p id="save-status" style="margin-top: 1rem; font-size: 0.9rem; font-weight: bold; color: var(--accent-blue);">Menyiapkan transmisi data...</p>
+        </div>
+        
+        <button onclick="location.reload()" class="btn-primary">Main Lagi</button>
+    </div>
+</div>
+
+<script>
+    // --- KONFIGURASI API GOOGLE APPS SCRIPT ---
+    const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxITf_H2zjlqPnpZeRTAicug0gCvLHXolLHzxq_oP6awd-481tXR-6CPXzcbbwF7OIc/exec';
+
+    // Variabel Game
+    const TOTAL_QUESTIONS_PER_SESSION = 10;
+    const TIME_PER_QUESTION = 90;
+    let currentQuestionIndex = 0, userResponses = [], selectedQuestions = [], questionTimerId = null, totalStatements = 0;
+    let gameStartTime, playerName, playerSchool, isDataSubmitted = false;
+
+    // --- BANK SOAL BARU: GELOMBANG CAHAYA (30 Soal) ---
+    const GAME_QUESTION_BANK = [
+        { 
+            stimulus: "Sifat Dasar Cahaya: Cahaya yang kita lihat sehari-hari memancarkan energi dari matahari atau lampu ke mata kita.", 
+            statements: [ 
+                { text: "Cahaya adalah gelombang elektromagnetik transversal sehingga dapat merambat di ruang hampa (vakum).", isTrue: true, explanation: "Benar, cahaya tidak membutuhkan medium fisik untuk merambat karena tersusun dari osilasi medan listrik dan magnet." }, 
+                { text: "Gelombang cahaya tergolong ke dalam jenis gelombang mekanik longitudinal.", isTrue: false, explanation: "Salah, gelombang mekanik membutuhkan medium (seperti bunyi), sedangkan cahaya adalah elektromagnetik." }
+            ] 
+        },
+        { 
+            stimulus: "Kecepatan Merambat: Kecepatan rambat cahaya di ruang hampa (c) adalah konstanta alam semesta sekitar 3 x 10^8 m/s.", 
+            statements: [ 
+                { text: "Kecepatan perambatan cahaya akan berkurang (melambat) ketika memasuki medium yang lebih rapat seperti kaca atau air.", isTrue: true, explanation: "Benar, indeks bias medium yang lebih besar dari vakum menyebabkan kelajuan rambat cahaya berkurang (v = c/n)." }, 
+                { text: "Di ruang hampa, cahaya berwarna merah merambat lebih cepat dibandingkan cahaya berwarna ungu.", isTrue: false, explanation: "Salah, di ruang hampa semua spektrum gelombang elektromagnetik merambat dengan kecepatan yang persis sama, yaitu c." }
+            ] 
+        },
+        { 
+            stimulus: "Spektrum Gelombang Elektromagnetik: Cahaya tampak hanya mencakup daerah frekuensi yang sangat kecil pada spektrum elektromagnetik.", 
+            statements: [ 
+                { text: "Gelombang inframerah memiliki ukuran panjang gelombang yang lebih besar daripada cahaya merah.", isTrue: true, explanation: "Benar, inframerah berada di bawah spektrum merah sehingga frekuensinya lebih rendah dan panjang gelombangnya lebih besar." }, 
+                { text: "Sinar Ultraviolet (UV) membawa energi foton yang lebih kecil dibandingkan spektrum cahaya tampak.", isTrue: false, explanation: "Salah, sinar UV memiliki frekuensi yang lebih tinggi, sehingga energi yang dibawanya lebih besar menurut persamaan E = h.f." }
+            ] 
+        },
+        { 
+            stimulus: "Dispersi Cahaya: Terbentuknya pelangi di langit setelah hujan terjadi akibat penguraian cahaya putih matahari.", 
+            statements: [ 
+                { text: "Warna ungu dibelokkan paling kuat (sudut deviasi terbesar) di dalam rintik air karena memiliki indeks bias paling besar.", isTrue: true, explanation: "Benar, cahaya dengan panjang gelombang terpendek (ungu/biru) mengalami pembiasan paling besar dalam medium." }, 
+                { text: "Dispersi dapat terjadi karena semua spektrum warna mengalami perubahan kecepatan yang seragam saat memasuki prisma atau air.", isTrue: false, explanation: "Salah, dispersi terjadi justru karena setiap warna (frekuensi) memiliki kecepatan rambat yang BERBEDA di dalam medium." }
+            ] 
+        },
+        { 
+            stimulus: "Interferensi Celah Ganda Young: Eksperimen legendaris Thomas Young membuktikan bahwa cahaya bertindak sebagai gelombang.", 
+            statements: [ 
+                { text: "Pita terang pusat yang terbentuk pada layar terjadi akibat interferensi konstruktif dengan selisih beda lintasan nol.", isTrue: true, explanation: "Benar, cahaya dari kedua celah menempuh jarak yang persis sama menuju titik tengah layar sehingga saling menguatkan." }, 
+                { text: "Jika jarak antar kedua celah (d) diperlebar, maka jarak antar pita terang yang terbentuk di layar akan semakin lebar pula.", isTrue: false, explanation: "Salah, jarak antar pita terang (y) berbanding terbalik dengan jarak antar celah. Jika jarak celah diperlebar, pita-pita menjadi lebih rapat." }
+            ] 
+        },
+        { 
+            stimulus: "Difraksi Celah Tunggal: Sinar laser yang dilewatkan pada satu celah sangat sempit akan menyebar dan membentuk pola terang-gelap di dinding.", 
+            statements: [ 
+                { text: "Semakin sempit ukuran celah yang dilewati cahaya, pola pita terang pusat pada layar akan semakin melebar.", isTrue: true, explanation: "Benar, efek pelenturan (difraksi) berbanding terbalik dengan ukuran halangan/celah. Semakin sempit, pelenturannya semakin besar." }, 
+                { text: "Peristiwa difraksi membuktikan secara kuat bahwa cahaya bergerak lurus tegak lurus murni layaknya partikel peluru.", isTrue: false, explanation: "Salah, difraksi (pelenturan) adalah karakteristik khas dari gelombang yang mampu menyebar melewatu tepian celah." }
+            ] 
+        },
+        { 
+            stimulus: "Polarisasi Cahaya: Cahaya matahari yang tak terpolarisasi memancarkan osilasi medan listrik ke segala arah.", 
+            statements: [ 
+                { text: "Kacamata hitam berjenis polaroid berfungsi mengurangi silau dengan memblokir komponen gelombang cahaya yang bergetar sejajar dengan jalan/permukaan pantul.", isTrue: true, explanation: "Benar, polaroid menyerap cahaya pantul yang terpolarisasi linier sejajar bidang horizontal." }, 
+                { text: "Sama seperti cahaya, gelombang bunyi juga dapat dipolarisasikan jika dilewatkan pada dua lapis kristal tourmalin.", isTrue: false, explanation: "Salah, polarisasi hanya bisa terjadi pada gelombang transversal. Gelombang bunyi adalah longitudinal sehingga tidak dapat dipolarisasi." }
+            ] 
+        },
+        { 
+            stimulus: "Hukum Snellius (Pembiasan): Sedotan yang berada di dalam gelas berisi air bening akan terlihat seakan-akan bengkok atau patah.", 
+            statements: [ 
+                { text: "Cahaya merambat dari udara (kurang rapat) masuk ke dalam air (lebih rapat) akan dibiaskan mendekati garis normal.", isTrue: true, explanation: "Benar, menurut hukum Snellius sudut bias akan lebih kecil dari sudut datang jika indeks bias medium kedua lebih besar." }, 
+                { text: "Pembiasan terjadi semata-mata karena frekuensi gelombang cahaya yang berubah saat masuk ke medium air.", isTrue: false, explanation: "Salah, saat merambat beda medium, FREKUENSI cahaya tetap konstan. Yang berubah adalah kecepatan dan panjang gelombangnya." }
+            ] 
+        },
+        { 
+            stimulus: "Pemantulan Sempurna (Total Internal Reflection): Teknologi transmisi data internet tingkat tinggi memanfaatkan serat optik (fiber optics).", 
+            statements: [ 
+                { text: "Salah satu syarat mutlak pemantulan sempurna adalah berkas cahaya harus bergerak dari medium lebih rapat menuju medium yang kurang rapat.", isTrue: true, explanation: "Benar, misalnya cahaya memantul kembali dari dalam kaca (inti fiber) tanpa bisa keluar ke lapisan selubung luar yang lebih renggang." }, 
+                { text: "Pemantulan internal total dapat terjadi apabila sudut datang cahaya di bidang batas lebih kecil dari sudut kritis.", isTrue: false, explanation: "Salah, cahaya harus datang dengan sudut yang LEBIH BESAR dari sudut kritis agar pantul sempurna dapat terjadi." }
+            ] 
+        },
+        { 
+            stimulus: "Warna Benda Opaque (Tak Tembus Cahaya): Selembar daun terlihat berwarna hijau segar saat ditimpa sinar matahari siang.", 
+            statements: [ 
+                { text: "Daun tampak hijau karena klorofil di dalamnya menyerap gelombang warna lain (merah/biru) dan memantulkan warna hijau ke mata kita.", isTrue: true, explanation: "Benar, warna benda keruh ditentukan oleh spektrum gelombang cahaya apa yang dipantulkannya." }, 
+                { text: "Sebuah baju yang berwarna hitam legam memiliki sifat memantulkan hampir seluruh spektrum cahaya tampak yang jatuh padanya.", isTrue: false, explanation: "Salah, benda hitam terlihat gelap karena ia MENYERAP hampir seluruh spektrum cahaya tampak, tidak memantulkannya." }
+            ] 
+        },
+        { 
+            stimulus: "Kisi Difraksi: Keping cakram padat (CD/DVD) bila dilihat di bawah lampu tampak memancarkan susunan warna pelangi.", 
+            statements: [ 
+                { text: "Guratan data digital yang sangat rapat pada permukaan CD bertindak layaknya celah banyak (kisi) yang mendifraksikan cahaya datang.", isTrue: true, explanation: "Benar, celah-celah seukuran panjang gelombang cahaya pada disk akan menyebabkan interferensi destruktif/konstruktif." }, 
+                { text: "Warna-warni pada CD terjadi semata-mata karena lapisan tinta pelangi super tipis yang dicetak oleh pabrik di permukaannya.", isTrue: false, explanation: "Salah, warna itu adalah hasil efek optik fisis (difraksi & interferensi kisi), bukan pigmen kimia." }
+            ] 
+        },
+        { 
+            stimulus: "Hamburan Rayleigh: Warna biru cemerlang pada langit saat siang hari cerah bukan disebabkan oleh warna molekul udara itu sendiri.", 
+            statements: [ 
+                { text: "Cahaya matahari berwarna biru memiliki panjang gelombang lebih pendek sehingga dihamburkan ke segala arah lebih efisien oleh atmosfer.", isTrue: true, explanation: "Benar, intensitas hamburan (Rayleigh scattering) berbanding terbalik terhadap pangkat empat dari panjang gelombang." }, 
+                { text: "Saat senja, langit menjadi kemerahan karena atmosfer bumi menyerap semua energi gelombang merah secara tiba-tiba.", isTrue: false, explanation: "Salah, saat senja, jarak tempuh cahaya matahari di atmosfer lebih panjang; cahaya biru sudah habis dihamburkan, menyisakan warna merah/kuning yang menembus ke mata kita." }
+            ] 
+        },
+        { 
+            stimulus: "Interferensi Lapisan Tipis: Sering kita jumpai tumpahan genangan oli di jalan aspal yang memantulkan pola warna-warni spiral indah.", 
+            statements: [ 
+                { text: "Pola warna ini timbul dari superposisi gelombang cahaya yang dipantulkan dari batas atas oli dan batas bawah oli yang bertemu air.", isTrue: true, explanation: "Benar, beda lintasan gelombang pantul dari dua permukaan ini menimbulkan pola pita warna interferensi." }, 
+                { text: "Ketebalan lapisan oli tidak mempengaruhi corak spektrum warna yang diamati oleh mata.", isTrue: false, explanation: "Salah, ketebalan lapisan langsung menentukan beda lintasan fase gelombang. Perubahan tebal mikrometer akan mengubah warna yang dihasilkan." }
+            ] 
+        },
+        { 
+            stimulus: "Polarisasi dengan Sudut Brewster: Cahaya yang mengenai permukaan air atau kaca dapat menjadi terpolarisasi.", 
+            statements: [ 
+                { text: "Sudut Brewster merupakan sudut datang spesifik di mana sinar pantul yang terpolarisasi saling tegak lurus (90 derajat) terhadap sinar biasnya.", isTrue: true, explanation: "Benar, secara matematis hukum Brewster terjadi saat tan(θp) = n2/n1 dan pantulan linear polarisasinya 100%." }, 
+                { text: "Arah osilasi (getaran) gelombang cahaya pantul pada sudut Brewster tegak lurus menembus ke dalam bidang batas permukaan.", isTrue: false, explanation: "Salah, arah getaran polarisasi cahaya hasil pantulan akan sejajar dengan bidang datar permukaan batas pemantul tersebut." }
+            ] 
+        },
+        { 
+            stimulus: "Kriteria Rayleigh (Daya Urai Optik): Sebuah teleskop di bumi digunakan untuk memisahkan citra dua bintang yang sangat berdekatan (sistem bintang ganda).", 
+            statements: [ 
+                { text: "Menurut Rayleigh, dua titik dapat dibedakan sebagai titik terpisah jika puncak terang bayangan difraksi bintang pertama berimpit dengan minimum pertama bayangan bintang kedua.", isTrue: true, explanation: "Benar, ini adalah batas resolusi minimum sistem optik melingkar akibat difraksi cahaya." }, 
+                { text: "Semakin kecil ukuran diameter lensa/cermin objektif teleskop, maka daya urai (resolusinya) akan semakin baik.", isTrue: false, explanation: "Salah, resolusi berbanding lurus dengan diameter lensa (D). Teleskop lebih besar akan meminimalkan sudut difraksi, sehingga objek lebih tajam." }
+            ] 
+        },
+        { 
+            stimulus: "Fotometri (Iluminasi): Seseorang membaca buku di bawah sorotan lampu meja belajar yang memancarkan lumen secara isotropik.", 
+            statements: [ 
+                { text: "Jika jarak antara lampu meja dengan buku dijauhkan menjadi 2 kali lipatnya, kuat penerangan (iluminansi) pada buku menjadi hanya seperempat kalinya.", isTrue: true, explanation: "Benar, intensitas cahaya memenuhi hukum kuadrat terbalik (1/r²)." }, 
+                { text: "Satuan standar Sistem Internasional (SI) untuk mengukur total fluks cahaya pancaran benda sumber adalah Joule.", isTrue: false, explanation: "Salah, energi gelombang diukur dengan Joule, namun untuk besaran fluks cahaya tampak (fotometri) diukur dalam Lumen (lm)." }
+            ] 
+        },
+        { 
+            stimulus: "Efek Doppler pada Gelombang Cahaya: Astronom mengamati gerak translasi galaksi-galaksi jauh di tepi semesta.", 
+            statements: [ 
+                { text: "Galaksi yang bergerak menjauhi bumi dengan kelajuan tinggi akan menunjukkan adanya fenomena pergeseran merah (Redshift) pada spektrum cahayanya.", isTrue: true, explanation: "Benar, muka gelombang yang ditarik menjauh menyebabkan panjang gelombang relatif meregang mendekati pita warna merah." }, 
+                { text: "Peristiwa Redshift berarti mata teleskop di bumi menerima gelombang cahaya dengan frekuensi yang lebih tinggi dari pancaran aslinya.", isTrue: false, explanation: "Salah, bergeser ke arah pita merah berarti panjang gelombangnya bertambah, yang mana berkorelasi dengan frekuensi yang LEBIH KECIL." }
+            ] 
+        },
+        { 
+            stimulus: "Dualisme Gelombang-Partikel: Selama berabad-abad perdebatan apakah cahaya itu sebuah aliran gelombang kontinyu atau tembakan partikel diskrit.", 
+            statements: [ 
+                { text: "Peristiwa Efek Fotolistrik hanya dapat diterangkan dengan baik jika cahaya diasumsikan sebagai kumpulan paket energi (partikel foton) yang diskrit.", isTrue: true, explanation: "Benar, penemuan Einstein pada efek fotolistrik ini memvalidasi teori mekanika kuantum partikel cahaya." }, 
+                { text: "Dalam eksperimen celah ganda, karakteristik partikel foton lah yang menciptakan garis pita gelap-terang pada layar penangkap.", isTrue: false, explanation: "Salah, garis gelap-terang pada interferensi celah ganda adalah bukti tak terbantahkan dari sifat alami cahaya sebagai GELOMBANG." }
+            ] 
+        },
+        { 
+            stimulus: "Laser (Light Amplification by Stimulated Emission of Radiation): Pointer laser hijau sering dipakai untuk bahan tayangan presentasi.", 
+            statements: [ 
+                { text: "Dibandingkan lampu pijar rumah, berkas cahaya pada Laser bersifat sangat monokromatik dan memiliki fase yang teratur/koheren.", isTrue: true, explanation: "Benar, koherensi tinggi menyebabkan sinar laser mempertahankan gelombang yang sinergis dari pancaran atomnya." }, 
+                { text: "Sinar yang keluar dari ujung alat laser dirancang untuk langsung menyebar luas (dispersi angular tinggi) untuk menerangi satu ruangan penuh.", isTrue: false, explanation: "Salah, sinar laser sangat terkolimasi (terfokus paralel dalam satu garis lurus) sehingga daya jangkauannya sangat sempit namun pekat." }
+            ] 
+        },
+        { 
+            stimulus: "Indeks Bias Berlian: Kemilau batu permata intan jauh lebih terang dan memukau dibandingkan pantulan kepingan kaca biasa.", 
+            statements: [ 
+                { text: "Indeks bias absolut berlian yang sangat tinggi menyebabkan sudut kritisnya kecil, sehingga cahaya terjebak memantul-mantul internal memicu kemilau.", isTrue: true, explanation: "Benar, indeks bias tinggi (n~2.4) dan pemotongan geometris brilian memaksa cahaya melakukan pemantulan sempurna internal." }, 
+                { text: "Karena sangat padat, kecepatan propagasi cahaya ketika masuk ke dalam bongkahan intan menjadi lebih cepat dibanding saat di udara.", isTrue: false, explanation: "Salah, kecepatan rambat berbanding terbalik dengan indeks bias medium. Cahaya di berlian berjalan lambat (v = c/2.4)." }
+            ] 
+        },
+        { 
+            stimulus: "Aberasi Kromatik: Fotografer menggunakan lensa kamera cembung, kadang mendapati gambar dengan pinggiran yang membias pelangi warna-warni.", 
+            statements: [ 
+                { text: "Kecacatan (aberasi) ini murni muncul akibat setiap komponen panjang gelombang cahaya memiliki indeks bias dan titik fokus berbeda di dalam lensa kaca.", isTrue: true, explanation: "Benar, indeks refraksi untuk warna ungu/biru lebih besar sehingga terfokus lebih pendek dibanding merah." }, 
+                { text: "Aberasi kromatik juga rutin dijumpai membelokkan gambar pada alat Teleskop pemantul yang menggunakan elemen cermin cekung murni.", isTrue: false, explanation: "Salah, fenomena pemantulan (refleksi) cermin tidak bergantung pada panjang gelombang cahaya, jadi teleskop pemantul bebas dari aberasi kromatik." }
+            ] 
+        },
+        { 
+            stimulus: "Fatamorgana (Mirage): Pada perjalanan darat aspal di siang terik, kerap muncul genangan air palsu di kejauhan jalan raya.", 
+            statements: [ 
+                { text: "Ilusi genangan air ini sesungguhnya terbentuk karena cahaya birunya langit mengalami pemantulan internal sempurna akibat lapisan udara aspal yang panas merenggang.", isTrue: true, explanation: "Benar, lapisan udara bawah memiliki indeks bias lebih rendah, membengkokkan arah rambat cahaya kembali melengkung ke mata kita." }, 
+                { text: "Fatamorgana inferior hanya dapat diamati apabila temperatur udara di bagian bawah lebih dingin, dan di lapisan atas lebih panas.", isTrue: false, explanation: "Salah, formasi Mirage inferior (aspal berair) menuntut udara BAWAH harus jauh LEBIH PANAS dibanding atasnya." }
+            ] 
+        },
+        { 
+            stimulus: "Campuran Warna Cahaya (Aditif): Teknologi di balik panel penampil monitor komputer dan layar telepon genggam AMOLED.", 
+            statements: [ 
+                { text: "Pencampuran cahaya primer merah (Red), hijau (Green), dan biru (Blue) secara penuh dan merata akan menghasilkan proyeksi spektrum warna Putih.", isTrue: true, explanation: "Benar, ini merupakan model sintesis cahaya warna Aditif." }, 
+                { text: "Printer warna tinta yang memadukan cat pigmen Cyan, Magenta, dan Kuning (CMYK) di atas kertas beroperasi dengan prinsip pencampuran warna aditif.", isTrue: false, explanation: "Salah, pigmen kimia cetak menyerap panjang gelombang (subtraksi cahaya), ini masuk dalam prinsip warna Subtraktif." }
+            ] 
+        },
+        { 
+            stimulus: "Pembentukan Bayangan Geometris: Apabila benda dilekatkan di depan layar dengan satu sumber lampu sorot di hadapannya.", 
+            statements: [ 
+                { text: "Bila lampu memiliki dimensi fisik yang luas/besar, bayangan akan membentuk dua zona: area tergelap (umbra) di inti dan zona temaram (penumbra) di tepinya.", isTrue: true, explanation: "Benar, titik sumber berbeda pada pinggiran lampu memberikan gradasi cahaya iluminasi parsial (penumbra)." }, 
+                { text: "Orang yang terjebak berdiri dalam zona Penumbra bulan pada kejadian astronomi akan menyaksikan fenomena Gerhana Matahari Total secara penuh.", isTrue: false, explanation: "Salah, di zona penumbra, matahari hanya tertutup secara sebagian (Gerhana Matahari Sebagian)." }
+            ] 
+        },
+        { 
+            stimulus: "Hukum Optik Pemantulan: Seberkas sinar senter ditembakkan pada cermin datar.", 
+            statements: [ 
+                { text: "Sinar datang, sinar yang memantul, dan garis normal pemantul selalu berada (koplanar) dalam suatu bidang datar yang sama.", isTrue: true, explanation: "Benar, ini adalah postulat pertama pada dasar geometri hukum pemantulan optika." }, 
+                { text: "Besar sudut pantul gelombang cahaya tersebut secara konstan akan selalu bernilai setengah dari besar sudut datang cahaya.", isTrue: false, explanation: "Salah, hukum pemantulan mutlak mewajibkan sudut datang sama persis nilainya dengan sudut pantul (i = r)." }
+            ] 
+        },
+        { 
+            stimulus: "Kacamata dan Cacat Mata Optik: Lensa korektif digunakan untuk mengembalikan titik jatuh cahaya tepat pada bintik kuning saraf retina.", 
+            statements: [ 
+                { text: "Penderita rabun jauh (Miopia) melihat bayangan kabur di kejauhan karena bayangan jatuh di depan retina; sehingga diatasi oleh pemakaian lensa negatif (cekung).", isTrue: true, explanation: "Benar, lensa negatif mendivergensikan (memencarkan) sinar yang datang sehingga menggeser bayangan lebih ke belakang memukul retina." }, 
+                { text: "Orang tua yang menderita presbiopi parah diobati menggunakan kacamata lensa konkaf positif untuk memajukan cahaya ke depan.", isTrue: false, explanation: "Salah, presbiopi dan hipermetropi menggunakan lensa konveks (Cembung/Positif), bukan konkaf (Cekung/Negatif)." }
+            ] 
+        },
+        { 
+            stimulus: "Gelombang Elektromagnetik dan Persamaan Maxwell: Revolusi fisika modern yang membuktikan penyatuan ilmu listrik dan daya magnet dalam bentuk gelombang terang.", 
+            statements: [ 
+                { text: "Vektor medan listrik (E) dan vektor kuat medan magnet (B) dalam gelombang cahaya bervibrasi tegak lurus satu sama lain dan juga tegak lurus pada sumbu rambatannya.", isTrue: true, explanation: "Benar, polarisasi elektromagnetik selalu menjaga sifat transversal ortogonal tiga arah ini." }, 
+                { text: "Perambatan energi gelombang cahaya ke ruang hampa bumi mengharuskan adanya dorongan gaya magnet statis fisik dari matahari setiap detiknya secara mekanik.", isTrue: false, explanation: "Salah, sekali memancar, gelombang elektromagnetik memelihara otonominya; variasi medan listrik menciptakan magnet dan sebaliknya tanpa putus." }
+            ] 
+        },
+        { 
+            stimulus: "Hamburan Non-Polarisasi: Radiasi cahaya putih matahari di siang hari sangat menguasai pandangan visual satelit dan penerbangan atmosfer.", 
+            statements: [ 
+                { text: "Bila kita melihat langit cerah dengan posisi pandang memutar sudut siku 90 derajat terhadap orientasi matahari, cahaya tersebut telah terpolarisasi terutamanya secara linier parsial.", isTrue: true, explanation: "Benar, molekul gas atmosferik bertindak meradiasi balik dipol tegak lurus arah datangnya foton menyeleksi getaran polar." }, 
+                { text: "Cahaya mentari langsung yang kita tatap (hanya menggunakan filter peredam) tiba dalam bentuk sudah terpolarisasi murni horizontal.", isTrue: false, explanation: "Salah, cahaya matahari murni aslinya bersifat sama sekali tak terpolarisasi (osilasi acak pada semua bidang)." }
+            ] 
+        },
+        { 
+            stimulus: "Aplikasi Teknologi Sinar-X (Rontgen): Termasuk rumpun cahaya gelombang panjang dalam radiasi kuantum medis.", 
+            statements: [ 
+                { text: "Sinar-X berada pada rentang spektrum gelombang elektromagnetik berfrekuensi raksasa sehingga menembus jaringan kulit luaran namun terhalang tulang keras.", isTrue: true, explanation: "Benar, panjang gelombang angstrom menjamin kelolosan daya tembus rontgen yang tidak dihalangi oleh senyawa organik ringan." }, 
+                { text: "Sinar-X memiliki batasan kecepatan lebih lambat sebesar 2 x 10^8 m/s merambat di ruang antar bintang karena energinya terlampau tinggi.", isTrue: false, explanation: "Salah, karena Sinar-X adalah gelombang elektromagnetik, kelajuannya dalam vakum selalu tepat secepat konstanta cahaya C (3 x 10^8 m/s)." }
+            ] 
+        },
+        { 
+            stimulus: "Pembentukan Bayangan Lensa Cembung: Proyektor bioskop film memanipulasi susunan geometri optik pembesaran proyektif.", 
+            statements: [ 
+                { text: "Untuk mendesain bayangan film yang tegas muncul di kanvas layar besar (bersifat nyata, terbalik, dan diperbesar), objek sumber lampu harus diletakkan persis pada rentang antara fokus(F) dan (2F) dari lensa objektif.", isTrue: true, explanation: "Benar, objek benda yang jatuh di ruang II memproyeksikan bayangan sejati di ruang III (layar nyata yang membesar)." }, 
+                { text: "Sifat bayangan maya yang dihasilkan oleh sebuah cermin datar murni selalu memiliki konfigurasi orientasi atas-bawah yang terbalik telak (inversi sumbu Y).", isTrue: false, explanation: "Salah, bayangan pada cermin datar tidak pernah terbalik atas-bawah (kepala ke kaki), melainkan inversi tegak sisi lateral (kiri menukar kanan)." }
+            ] 
+        }
+    ];
+
+    // --- INISIALISASI ---
+    document.addEventListener('DOMContentLoaded', fetchLeaderboard);
+
+    // --- LOGIKA API & CLOUD ---
+    async function submitScoreCloud(score) {
+        if (isDataSubmitted || !playerName || !playerSchool) return;
+        isDataSubmitted = true;
+        
+        const statusEl = document.getElementById('save-status');
+        statusEl.innerText = "Mengunggah data ke server pusat (Menyimpan skor)...";
+        statusEl.style.color = "var(--accent-blue)";
+
+        try {
+            const timeTaken = Math.round((new Date() - gameStartTime) / 1000);
+            
+            const payload = {
+                playerName: playerName,
+                playerSchool: playerSchool,
+                score: score,
+                level: "Analisis", 
+                gameTopic: "Gelombang",
+                gameType: "Analisis Benar/Salah",
+                timeTakenSec: timeTaken,
+                game_id: "analisis_bs_cahaya_1"
+            };
+
+            const response = await fetch(APP_SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+            
+            if(result.status === 'success') {
+                statusEl.innerText = "✅ Rekam jejak berhasil disimpan ke database!";
+                statusEl.style.color = "var(--accent-green)";
+            } else {
+                throw new Error(result.message);
+            }
+        } catch (error) {
+            console.error("Gagal simpan:", error.message);
+            statusEl.innerText = "⚠️ Gangguan sinyal: Gagal menyimpan data.";
+            statusEl.style.color = "var(--accent-red)";
+        }
+    }
+
+    async function fetchLeaderboard() {
+        const tbody = document.getElementById('leaderboard-body');
+        try {
+            const response = await fetch(APP_SCRIPT_URL);
+            const result = await response.json();
+            
+            if(result.status === 'success' && result.data.length > 0) {
+                // Filter game terkait (Topik: Gelombang, Tipe: Analisis Benar/Salah)
+                let filteredData = result.data.filter(item => item.gameType === "Analisis Benar/Salah" && item.gameTopic === "Gelombang");
+                
+                // Urutkan: Skor tertinggi -> Waktu tercepat
+                filteredData.sort((a, b) => {
+                    if (b.score !== a.score) return b.score - a.score;
+                    return (a.timeTakenSec || 0) - (b.timeTakenSec || 0);
+                });
+
+                filteredData = filteredData.slice(0, 5); // Ambil Top 5
+                
+                if(filteredData.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--text-secondary);">Belum ada pemain yang tercatat.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = filteredData.map((entry, idx) => `
+                    <tr style="${idx === 0 ? 'font-weight:bold; background:rgba(0, 242, 254, 0.1);' : ''}">
+                        <td>#${idx + 1}</td>
+                        <td>${entry.playerName || 'Anonim'}<br><small style="color:var(--text-secondary)">${entry.playerSchool || '-'}</small></td>
+                        <td style="color:var(--accent-green); font-weight:bold;">${entry.score || 0}</td>
+                    </tr>
+                `).join('');
+            } else {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--text-secondary);">Database masih kosong.</td></tr>';
+            }
+        } catch (e) {
+            console.error(e);
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--accent-red);">Gagal memuat papan peringkat.</td></tr>';
+        }
+    }
+
+    // --- LOGIKA GAME ---
+    function startQuiz() {
+        playerName = document.getElementById('player-name').value.trim();
+        playerSchool = document.getElementById('player-school').value.trim();
+        
+        if (!playerName || !playerSchool) {
+            alert("Harap lengkapi identitas untuk akses sistem.");
+            return;
+        }
+
+        document.getElementById('display-name').textContent = playerName.toUpperCase();
+        document.getElementById('result-name').textContent = playerName;
+        
+        gameStartTime = new Date();
+        isDataSubmitted = false;
+
+        let availableQuestions = [...GAME_QUESTION_BANK];
+        shuffleArray(availableQuestions);
+        selectedQuestions = availableQuestions.slice(0, TOTAL_QUESTIONS_PER_SESSION);
+        
+        totalStatements = selectedQuestions.reduce((acc, q) => acc + q.statements.length, 0);
+        userResponses = Array(selectedQuestions.length).fill(null).map(() => []);
+
+        document.getElementById('total-q').textContent = selectedQuestions.length;
+        renderQuestions();
+        
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('quiz-area').style.display = 'block';
+        showQuestion(0);
+    }
+
+    function finishQuiz() {
+        if (questionTimerId) clearInterval(questionTimerId);
+        calculateResults();
+        document.getElementById('quiz-area').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'block';
+        window.scrollTo(0, 0);
+    }
+
+    function calculateResults() {
+        const totalCorrectResponses = userResponses.flat().filter(Boolean).length;
+        const finalScore = Math.round((totalCorrectResponses / totalStatements) * 100);
+        
+        // Update Visual Circle
+        document.getElementById('score-circle-el').style.setProperty('--score-percent', `${finalScore}%`);
+        
+        submitScoreCloud(finalScore);
+
+        const scoreElement = document.getElementById('final-score');
+        scoreElement.textContent = finalScore;
+        
+        const msgElement = document.getElementById('result-message');
+        if (finalScore >= 80) msgElement.innerHTML = `<span style="color:var(--accent-green)">PEMAHAMAN SANGAT BAIK!</span><br>Konsepmu tentang Optik dan Gelombang Cahaya sangat mendalam. Benar ${totalCorrectResponses} dari ${totalStatements}.`;
+        else if (finalScore >= 60) msgElement.innerHTML = `<span style="color:var(--accent-blue)">CUKUP MEMUASKAN.</span><br>Paham konsep dasar cahaya dengan baik. Benar ${totalCorrectResponses} dari ${totalStatements}.`;
+        else msgElement.innerHTML = `<span style="color:var(--accent-red)">PERLU DITINGKATKAN.</span><br>Ayo pelajari lagi teori Gelombang Elektromagnetik dan Optik. Benar ${totalCorrectResponses} dari ${totalStatements}.`;
+    }
+
+    function shuffleArray(array) { 
+        for (let i = array.length - 1; i > 0; i--) { 
+            const j = Math.floor(Math.random() * (i + 1)); 
+            [array[i], array[j]] = [array[j], array[i]]; 
+        } 
+        return array; 
+    }
+
+    function renderQuestions() { 
+        const container = document.getElementById('questions-container'); 
+        container.innerHTML = ''; 
+        
+        selectedQuestions.forEach((qData, qIndex) => { 
+            const card = document.createElement('div'); 
+            card.className = 'question-card'; 
+            card.id = `q-card-${qIndex}`; 
+            
+            let statementsHTML = ''; 
+            qData.statements.forEach((stmt, sIndex) => { 
+                statementsHTML += `
+                <div class="statement-item" id="stmt-${qIndex}-${sIndex}">
+                    <div class="statement-row">
+                        <div class="statement-text">${stmt.text}</div>
+                        <div class="statement-buttons">
+                            <button class="tf-btn" onclick="handleAnswer(${qIndex}, ${sIndex}, true)">TRUE</button>
+                            <button class="tf-btn" onclick="handleAnswer(${qIndex}, ${sIndex}, false)">FALSE</button>
+                        </div>
+                    </div>
+                    <div id="explain-${qIndex}-${sIndex}" class="explanation-box">
+                        <strong>${stmt.isTrue ? "JAWABAN: TRUE (BENAR)" : "JAWABAN: FALSE (SALAH)"}</strong><br>
+                        ${stmt.explanation}
+                    </div>
+                </div>`; 
+            }); 
+            
+            card.innerHTML = `<div class="stimulus-box">${qData.stimulus}</div><div class="statements-container">${statementsHTML}</div>`; 
+            container.appendChild(card); 
+        }); 
+    }
+
+    function handleAnswer(qIndex, sIndex, userChoice) { 
+        const statement = selectedQuestions[qIndex].statements[sIndex]; 
+        const isCorrect = userChoice === statement.isTrue; 
+        userResponses[qIndex][sIndex] = isCorrect; 
+        
+        // UI Update Buttons
+        const itemContainer = document.getElementById(`stmt-${qIndex}-${sIndex}`);
+        const buttons = itemContainer.querySelectorAll('.tf-btn'); 
+        
+        // Highlight tombol yang dipilih user
+        const chosenButton = userChoice ? buttons[0] : buttons[1];
+        chosenButton.classList.add(isCorrect ? 'correct-selection' : 'incorrect-selection');
+        
+        // Disable tombol
+        buttons.forEach(btn => btn.disabled = true);
+        
+        // Tampilkan Penjelasan
+        const explainBox = document.getElementById(`explain-${qIndex}-${sIndex}`);
+        explainBox.style.display = 'block';
+        if(!isCorrect) explainBox.classList.add('wrong');
+
+        // Cek kelengkapan
+        const answeredCount = userResponses[qIndex].filter(r => r !== undefined).length; 
+        if (answeredCount === selectedQuestions[qIndex].statements.length) { 
+            document.getElementById('next-btn').disabled = false; 
+        } 
+    }
+
+    function showQuestion(index) { 
+        if (questionTimerId) clearInterval(questionTimerId); 
+        
+        document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active')); 
+        const currentCard = document.getElementById(`q-card-${index}`); 
+        
+        if (currentCard) { 
+            currentCard.classList.add('active'); 
+            currentQuestionIndex = index; 
+            document.getElementById('current-q').textContent = index + 1; 
+            
+            startStimulusTimer(); 
+            
+            const nextBtn = document.getElementById('next-btn'); 
+            nextBtn.disabled = true; 
+            
+            if (index === selectedQuestions.length - 1) { 
+                nextBtn.innerHTML = "Lihat Hasil &rarr;"; 
+                nextBtn.onclick = finishQuiz; 
+            } else { 
+                nextBtn.innerHTML = "Lanjut &rarr;"; 
+                nextBtn.onclick = nextQuestion; 
+            } 
+        } 
+    }
+
+    function startStimulusTimer() { 
+        let timeLeft = TIME_PER_QUESTION; 
+        const timerValueEl = document.getElementById('timer-value'); 
+        const timerBadgeEl = timerValueEl.parentElement; 
+        
+        timerValueEl.textContent = timeLeft; 
+        timerBadgeEl.style.borderColor = 'var(--accent-red)';
+        
+        questionTimerId = setInterval(() => { 
+            timeLeft--; 
+            timerValueEl.textContent = timeLeft; 
+            
+            if (timeLeft <= 0) { 
+                if (currentQuestionIndex === selectedQuestions.length - 1) { 
+                    finishQuiz(); 
+                } else { 
+                    nextQuestion(); 
+                } 
+            } 
+        }, 1000); 
+    }
+
+    function nextQuestion() { 
+        showQuestion(currentQuestionIndex + 1); 
+        window.scrollTo(0, 0); 
+    }
+</script>
+</body>
+</html>
