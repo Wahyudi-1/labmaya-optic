@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mastery Fisika: Gelombang Cahaya</title>
+    
+    <style>
+        :root {
+            /* Tema Gelombang Cahaya: Deep Ocean Blue, Wave Cyan, Energetic Purple */
+            --bg-primary: #0f172a; 
+            --text-primary: #f8fafc;
+            --accent-blue: #0ea5e9; /* Wave Cyan */
+            --accent-purple: #8b5cf6; /* Vibration Purple */
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --container-bg: #1e293b;
+            --border-color: #334155;
+        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-primary); color: var(--text-primary); line-height: 1.6; margin: 0; padding: 20px; display: flex; justify-content: center; min-height: 100vh; }
+        .main-container { background: var(--container-bg); max-width: 900px; width: 100%; border-radius: 16px; border: 1px solid var(--border-color); padding: 2rem; box-sizing: border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h1 { color: var(--accent-blue); text-align: center; margin-bottom: 1.5rem; font-size: 2.2rem; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 10px rgba(14, 165, 233, 0.3); }
+        
+        #start-screen { text-align: center; max-width: 600px; margin: 0 auto; }
+        .form-group { margin-bottom: 1.5rem; text-align: left; }
+        .form-label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #94a3b8; }
+        .form-input { width: 100%; padding: 0.75rem; background: #0f172a; border: 2px solid var(--border-color); border-radius: 8px; font-size: 1rem; color: white; box-sizing: border-box; transition: border-color 0.3s; }
+        .form-input:focus { outline: none; border-color: var(--accent-purple); }
+        #error-msg { color: var(--accent-red); margin-bottom: 1rem; font-weight: bold; display: none; }
+        
+        .btn-primary { background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); color: white; border: none; padding: 1rem 2.5rem; font-size: 1.1rem; font-weight: bold; border-radius: 8px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; width: 100%; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4); }
+        
+        #quiz-area { display: none; }
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); gap: 1rem; flex-wrap: wrap;}
+        .progress-badge { background: var(--accent-purple); color: white; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; }
+        .timer-badge { background: #ca8a04; color: white; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; transition: background-color 0.3s; }
+        .timer-badge.low-time { background: var(--accent-red); animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+        
+        .question-card { display: none; }
+        .question-card.active { display: block; animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        
+        .stimulus-box { background-color: #0f172a; border-left: 4px solid var(--accent-purple); padding: 1.5rem; margin-bottom: 1.5rem; border-radius: 8px; color: #cbd5e1; font-style: italic; }
+        .question-text { font-size: 1.25rem; font-weight: 600; margin-bottom: 1.5rem; line-height: 1.5; }
+        .options-grid { display: grid; gap: 1rem; }
+        .option-label { display: flex; align-items: center; padding: 1rem; border: 2px solid var(--border-color); border-radius: 10px; cursor: pointer; transition: all 0.2s ease; background: #1e293b; }
+        .option-label:hover { background: #2dd4bf1a; border-color: var(--accent-blue); }
+        .option-input { margin-right: 15px; width: 22px; height: 22px; cursor: pointer; accent-color: var(--accent-purple); }
+        
+        .quiz-nav { display: flex; justify-content: space-between; margin-top: 2.5rem; }
+        
+        #result-screen { display: none; text-align: center; }
+        .score-circle { width: 160px; height: 160px; border: 6px solid var(--accent-purple); border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; margin: 2rem auto; box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
+        .score-value { font-size: 4rem; font-weight: bold; color: var(--accent-blue); }
+        
+        /* Leaderboard Styles */
+        .leaderboard-container { margin-top: 3rem; background: #0f172a; padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); }
+        .leaderboard-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem; }
+        .leaderboard-table th { padding: 12px 10px; border-bottom: 2px solid var(--border-color); color: var(--accent-purple); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; }
+        .leaderboard-table td { padding: 12px 10px; border-bottom: 1px solid #1e293b; }
+    </style>
+</head>
+<body>
+<div class="main-container">
+    <!-- START SCREEN -->
+    <div id="start-screen">
+        <h1>Kuis Master: Gelombang Cahaya</h1>
+        <p style="color: #94a3b8; margin-bottom: 2.5rem; font-size: 1.1rem;">Uji pemahamanmu tentang spektrum elektromagnetik, optik fisis (interferensi, difraksi, polarisasi), refraksi, dan dispersi cahaya. <strong>Pilih semua opsi jawaban yang menurutmu benar.</strong></p>
+        
+        <div id="error-msg">Identitas Pemain (Nama & Kelas) wajib diisi!</div>
+
+        <div class="form-group">
+            <label class="form-label">Nama Pemain</label>
+            <input type="text" id="player-name" class="form-input" placeholder="Masukkan nama..." required>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Kelas / Sekolah</label>
+            <input type="text" id="player-school" class="form-input" placeholder="Contoh: XI - MIPA 1" required>
+        </div>
+        
+        <button onclick="startQuiz()" class="btn-primary">MULAI KUIS</button>
+
+        <!-- Leaderboard -->
+        <div class="leaderboard-container">
+            <h3 style="margin-top: 0; color: var(--text-primary); display: flex; align-items: center; justify-content: center; gap: 10px;">
+                🏆 Papan Peringkat Global
+            </h3>
+            <table class="leaderboard-table">
+                <thead>
+                    <tr><th>Rank</th><th>Pemain</th><th>Skor</th></tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    <tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 2rem 0;">Menghubungkan ke server satelit...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- QUIZ AREA -->
+    <div id="quiz-area">
+        <div class="quiz-header">
+            <div class="player-info" style="color: var(--accent-blue); font-size: 1.1rem;"><strong id="display-name"></strong></div>
+            <div style="display: flex; gap: 10px;">
+                <div class="progress-badge">Soal <span id="current-q">1</span>/10</div>
+                <div class="timer-badge">Waktu: <span id="timer-value">90</span>s</div>
+            </div>
+        </div>
+        
+        <div id="questions-container"></div>
+        
+        <div class="quiz-nav">
+            <button id="next-btn" onclick="nextQuestion()" class="btn-primary">Lanjut / Simpan Jawaban →</button>
+        </div>
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div id="result-screen">
+        <h2 style="color: var(--accent-blue); font-size: 2rem;">Laporan Analisis Kuis</h2>
+        <div class="score-circle">
+            <span class="score-value" id="final-score">0</span>
+            <small style="color: #94a3b8; letter-spacing: 2px;">SKOR AKHIR</small>
+        </div>
+        <div id="result-message" style="margin-bottom: 20px; font-size: 1.2rem; font-weight: 600;"></div>
+        <div id="save-status" style="margin-bottom: 2.5rem; font-weight: bold; color: var(--accent-purple); padding: 1rem; background: #0f172a; border-radius: 8px;">Mengirim data ke database...</div>
+        
+        <button onclick="location.reload()" class="btn-primary">KEMBALI KE BERANDA</button>
+    </div>
+</div>
+
+<script>
+    // --- KONFIGURASI API GOOGLE APPS SCRIPT ---
+    const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxITf_H2zjlqPnpZeRTAicug0gCvLHXolLHzxq_oP6awd-481tXR-6CPXzcbbwF7OIc/exec';
+
+    const TOTAL_QUESTIONS = 10;
+    const TIME_LIMIT = 90;
+    let currentIdx = 0;
+    let userAnswers = [], selectedQuestions = [], timerId = null;
+    let playerName, playerSchool, gameStartTime;
+
+    // Bank Soal Gelombang Cahaya (30 Soal PGK)
+    const GAME_QUESTION_BANK = [
+        { 
+            stimulus: "Cahaya merupakan bentuk radiasi elektromagnetik yang dapat ditangkap oleh mata manusia.", 
+            question: "Manakah pernyataan yang BENAR mengenai sifat-sifat umum gelombang cahaya?", 
+            options: [
+                { text: "Dapat merambat melalui ruang hampa (vakum) tanpa memerlukan partikel medium.", correct: true },
+                { text: "Termasuk dalam kelompok gelombang transversal.", correct: true },
+                { text: "Kecepatannya di ruang hampa bernilai sekitar 3 × 10⁸ m/s.", correct: true },
+                { text: "Merupakan gelombang mekanik yang memerlukan udara untuk merambat.", correct: false }
+            ] 
+        },
+        { 
+            stimulus: "Spektrum elektromagnetik mencakup rentang panjang gelombang dan frekuensi yang sangat luas, dari sinar gamma hingga gelombang radio.", 
+            question: "Karakteristik yang benar terkait Spektrum Elektromagnetik adalah:", 
+            options: [
+                { text: "Sinar gamma memiliki frekuensi dan energi foton yang paling tinggi.", correct: true },
+                { text: "Pada spektrum cahaya tampak, warna merah memiliki panjang gelombang terpanjang.", correct: true },
+                { text: "Gelombang radio memiliki energi foton tertinggi di antara spektrum lainnya.", correct: false },
+                { text: "Sinar ultraviolet memiliki panjang gelombang yang lebih pendek dari cahaya ungu.", correct: true }
+            ] 
+        },
+        { 
+            stimulus: "Dispersi cahaya terjadi ketika cahaya putih (polikromatik) dilewatkan melalui prisma kaca dan terurai menjadi warna-warni pelangi.", 
+            question: "Manakah penjelasan fisis yang BENAR mengenai peristiwa dispersi?", 
+            options: [
+                { text: "Cahaya putih terurai karena setiap warna (panjang gelombang) memiliki indeks bias yang berbeda di dalam kaca prisma.", correct: true },
+                { text: "Terjadi proses pembiasan ganda saat cahaya masuk dan keluar prisma.", correct: true },
+                { text: "Cahaya ungu dibelokkan (deviasi) paling besar karena indeks biasnya paling besar.", correct: true },
+                { text: "Frekuensi cahaya berubah-ubah saat masuk ke dalam medium prisma.", correct: false }
+            ] 
+        },
+        { 
+            stimulus: "Pembiasan (Refraksi) terjadi akibat perbedaan kerapatan optik antarmedium yang menyebabkan perubahan kelajuan gelombang.", 
+            question: "Pernyataan yang tepat ketika cahaya merambat dari udara (renggang) masuk ke dalam air (rapat) adalah:", 
+            options: [
+                { text: "Kecepatan rambat cahaya akan berkurang (melambat).", correct: true },
+                { text: "Panjang gelombang cahaya akan memendek di dalam air.", correct: true },
+                { text: "Frekuensi cahaya akan berubah menyesuaikan medium barunya.", correct: false },
+                { text: "Sinar bias akan dibelokkan mendekati garis normal.", correct: true }
+            ] 
+        },
+        { 
+            question: "Mengenai Sudut Kritis dan Pemantulan Sempurna (Total Internal Reflection), manakah syarat dan sifat yang TEPAT?", 
+            options: [
+                { text: "Hanya dapat terjadi ketika cahaya merambat dari medium lebih rapat ke medium kurang rapat.", correct: true },
+                { text: "Sudut datang cahaya harus lebih besar dari sudut kritis medium tersebut.", correct: true },
+                { text: "Merupakan prinsip kerja utama yang diaplikasikan pada kabel serat optik (fiber optic).", correct: true },
+                { text: "Dapat terjadi saat cahaya menembak dari udara menuju kaca.", correct: false }
+            ] 
+        },
+        { 
+            stimulus: "Langit siang hari tampak berwarna biru, namun saat matahari terbit atau terbenam langit berubah kemerahan. Fenomena ini diakibatkan oleh hamburan cahaya (Scattering).", 
+            question: "Pernyataan yang benar mengenai peristiwa hamburan atmosfer adalah:", 
+            options: [
+                { text: "Hamburan atmosfer (Rayleigh Scattering) menyebarkan gelombang cahaya pendek (biru/ungu) lebih kuat daripada yang panjang.", correct: true },
+                { text: "Saat matahari terbenam, cahaya biru sudah banyak dihamburkan sehingga cahaya merah lebih mendominasi sisa cahaya yang sampai ke mata.", correct: true },
+                { text: "Lapisan atmosfer sama sekali tidak memengaruhi warna sinar matahari.", correct: false },
+                { text: "Hamburan cahaya identik prosesnya dengan pembiasan dispersi pada prisma.", correct: false }
+            ] 
+        },
+        { 
+            question: "Interferensi cahaya adalah perpaduan dua atau lebih gelombang cahaya yang menghasilkan pola gelap-terang. Apa SYARAT MUTLAK agar pola interferensi terlihat stabil?", 
+            options: [
+                { text: "Kedua sumber cahaya harus koheren (memiliki beda fase yang konstan).", correct: true },
+                { text: "Kedua sumber harus memiliki frekuensi/panjang gelombang yang sama (monokromatik).", correct: true },
+                { text: "Beda fase antar kedua gelombang harus selalu berubah-ubah secara acak.", correct: false },
+                { text: "Amplitudo kedua gelombang harus bernilai sangat berbeda ekstrem.", correct: false }
+            ] 
+        },
+        { 
+            stimulus: "Eksperimen Celah Ganda Young menunjukkan bukti kuat sifat gelombang pada cahaya dengan menghasilkan pita terang dan gelap pada layar.", 
+            question: "Konsep dasar interferensi pada celah ganda Young adalah:", 
+            options: [
+                { text: "Pola terang (konstruktif) terjadi jika beda lintasan kedua gelombang (Δx) adalah kelipatan bulat dari λ (n.λ).", correct: true },
+                { text: "Pola gelap (destruktif) terjadi jika beda lintasan gelombang adalah kelipatan ganjil dari setengah λ.", correct: true },
+                { text: "Jarak antar pita terang berbanding lurus dengan panjang gelombang cahaya yang digunakan.", correct: true },
+                { text: "Jika jarak antar kedua celah (d) diperbesar, jarak antar pita terang di layar akan semakin lebar.", correct: false }
+            ] 
+        },
+        { 
+            stimulus: "Rumus interferensi celah ganda untuk menentukan letak pita terang ke-n adalah y = (n.L.λ) / d.", 
+            question: "Berdasarkan persamaan tersebut, jika kita ingin MEMPERLEBAR jarak antar pita terang (y), apa yang dapat dilakukan?", 
+            options: [
+                { text: "Menjauhkan letak layar dari celah (memperbesar L).", correct: true },
+                { text: "Menggunakan cahaya dengan panjang gelombang lebih besar (misal, merah dibanding biru).", correct: true },
+                { text: "Memperkecil jarak pemisah antara dua celah (memperkecil d).", correct: true },
+                { text: "Mencelupkan seluruh alat eksperimen ke dalam air (memperkecil panjang gelombang).", correct: false }
+            ] 
+        },
+        { 
+            stimulus: "Gelembung sabun dan lapisan tipis tumpahan minyak di atas genangan air sering terlihat berwarna-warni.", 
+            question: "Peristiwa optik fisis apa dan bagaimana hal ini terjadi?", 
+            options: [
+                { text: "Diakibatkan oleh Interferensi Selaput Tipis (Thin Film Interference).", correct: true },
+                { text: "Warna-warni terjadi murni karena adanya pigmen warna pelangi di dalam zat sabun/minyak.", correct: false },
+                { text: "Cahaya yang dipantulkan oleh batas atas selaput dan batas bawah selaput saling berinterferensi.", correct: true },
+                { text: "Syarat interferensi konstruktif/destruktifnya berbalikan dari celah Young karena adanya lompatan fase pemantulan (180°).", correct: true }
+            ] 
+        },
+        { 
+            stimulus: "Difraksi cahaya adalah peristiwa pelenturan atau penyebaran arah rambat gelombang saat melewati celah sempit atau ujung penghalang.", 
+            question: "Pernyataan yang BENAR mengenai difraksi celah tunggal adalah:", 
+            options: [
+                { text: "Pita terang pusat adalah yang paling lebar dan memiliki intensitas paling terang.", correct: true },
+                { text: "Syarat terjadinya pita gelap minimum ke-n dirumuskan dengan: d sin θ = n.λ.", correct: true },
+                { text: "Lebar celah tidak memiliki pengaruh sama sekali terhadap bentuk pola difraksi di layar.", correct: false },
+                { text: "Fenomena difraksi ini membuktikan bahwa cahaya tidak merambat persis lurus pada bukaan yang sangat kecil.", correct: true }
+            ] 
+        },
+        { 
+            question: "Pada eksperimen difraksi celah tunggal, bagaimana efek dari perubahan parameter ukuran celah (d)?", 
+            options: [
+                { text: "Semakin sempit ukuran celah (d diperkecil), pola pita terang pusat akan menyebar semakin melebar.", correct: true },
+                { text: "Jika ukuran celah (d) diperbesar, maka pita terang pusat akan menyempit.", correct: true },
+                { text: "Lebar pita terang pusat di layar ukurannya akan selalu sama persis dengan lebar asli celah tersebut.", correct: false },
+                { text: "Efek pelenturan difraksi menjadi sangat signifikan (jelas) jika lebar celah seorde dengan panjang gelombang cahaya.", correct: true }
+            ] 
+        },
+        { 
+            stimulus: "Kisi Difraksi merupakan alat berupa kepingan kaca/plastik yang memiliki ribuan goresan (celah) mikroskopis paralel per sentimeter.", 
+            question: "Karakteristik pola difraksi dan prinsip kerja dari Kisi Difraksi adalah:", 
+            options: [
+                { text: "Banyak digunakan di spektrometer karena mampu memisahkan spektrum warna dengan tajam dan terang.", correct: true },
+                { text: "Hubungan konstanta kisi (d) dengan jumlah celah (N) adalah d = 1/N.", correct: true },
+                { text: "Persamaan letak pita terang utama (maksimum) adalah d sin θ = n.λ.", correct: true },
+                { text: "Menghasilkan pita terang yang lebih kabur dan lebar dibanding celah ganda Young.", correct: false }
+            ] 
+        },
+        { 
+            question: "Jika sebuah kisi difraksi disinari dengan cahaya polikromatik (putih), pola apa yang akan terbentuk di layar?", 
+            options: [
+                { text: "Terang pusat (orde nol, n=0) akan berwarna putih sempurna.", correct: true },
+                { text: "Pita orde pertama (n=1) dan seterusnya akan terurai menjadi spektrum warna pelangi.", correct: true },
+                { text: "Pada pita spektrum, warna ungu dibelokkan dengan sudut deviasi paling kecil dibandingkan warna merah.", correct: true },
+                { text: "Jarak antar pita spektrum tidak akan terpengaruh jika kita mengganti jumlah goresan kisi (N).", correct: false }
+            ] 
+        },
+        { 
+            stimulus: "Daya Urai (Resolusi) adalah kemampuan alat optik untuk menghasilkan dua bayangan terpisah dari dua titik benda yang saling berdekatan (Kriteria Rayleigh).", 
+            question: "Bagaimana cara MENGINGKATKAN Daya Urai suatu instrumen optik seperti teleskop atau mikroskop?", 
+            options: [
+                { text: "Memperbesar diameter lensa objektif instrumen optik tersebut (D besar).", correct: true },
+                { text: "Memperkecil diameter bukaan (diafragma) lensa sekecil mungkin.", correct: false },
+                { text: "Menggunakan sumber cahaya penerang dengan panjang gelombang yang pendek (misal, biru/ungu).", correct: true },
+                { text: "Karena sudut resolusi (θm = 1,22 λ / D) harus diusahakan bernilai sekecil mungkin.", correct: true }
+            ] 
+        },
+        { 
+            stimulus: "Polarisasi cahaya adalah peristiwa terserapnya sebagian arah getar gelombang transversal sehingga hanya menyisakan arah getar tertentu.", 
+            question: "Pernyataan yang tepat mengenai konsep dasar polarisasi adalah:", 
+            options: [
+                { text: "Polarisasi membuktikan secara empiris bahwa cahaya merupakan gelombang transversal.", correct: true },
+                { text: "Cahaya matahari atau lampu pijar biasa merupakan cahaya tak terpolarisasi (bergetar ke segala arah).", correct: true },
+                { text: "Gelombang bunyi yang merambat di udara dapat mengalami polarisasi dengan filter polaroid.", correct: false },
+                { text: "Filter polaroid bekerja dengan memblokir medan listrik yang tegak lurus terhadap sumbu transmisinya.", correct: true }
+            ] 
+        },
+        { 
+            question: "Polarisasi cahaya TIDAK hanya terjadi menggunakan filter polaroid. Melalui mekanisme alamiah apa saja cahaya polikromatik biasa dapat menjadi terpolarisasi?", 
+            options: [
+                { text: "Pemantulan pada antarmuka dua medium dielektrik transparan (pada sudut Brewster).", correct: true },
+                { text: "Hamburan oleh debu dan molekul gas di atmosfer bumi.", correct: true },
+                { text: "Pembiasan ganda (birefringence) oleh kristal tertentu seperti kristal kalsit.", correct: true },
+                { text: "Interferensi cahaya yang melewati dua celah sempit berdekatan.", correct: false }
+            ] 
+        },
+        { 
+            stimulus: "Hukum Malus digunakan untuk menghitung intensitas cahaya yang lolos melalui dua buah lembar polaroid berjejer (Polarisator dan Analisator).", 
+            question: "Manakah perhitungan Hukum Malus (I = Imax cos²θ) yang BENAR?", 
+            options: [
+                { text: "Jika cahaya alami tak terpolarisasi (I0) melewati Polarisator pertama, intensitasnya menjadi setengahnya (I1 = ½ I0).", correct: true },
+                { text: "Intensitas yang keluar dari Analisator bergantung pada selisih sudut putar antara sumbu Polarisator dan Analisator.", correct: true },
+                { text: "Jika sumbu transmisi kedua polaroid saling tegak lurus (90°), intensitas cahaya yang keluar adalah nol (gelap total).", correct: true },
+                { text: "Cahaya yang berhasil keluar dari Analisator akan kembali menjadi tak terpolarisasi.", correct: false }
+            ] 
+        },
+        { 
+            stimulus: "Sudut Brewster adalah sudut datang tertentu saat terjadi pemantulan cahaya di bidang batas dua medium.", 
+            question: "Karakteristik khusus yang terjadi ketika cahaya datang tepat sebesar Sudut Brewster (θB) adalah:", 
+            options: [
+                { text: "Sinar yang dipantulkan mengalami polarisasi linear (bidang) secara sempurna 100%.", correct: true },
+                { text: "Sinar pantul dan sinar bias membentuk sudut saling tegak lurus sebesar 90°.", correct: true },
+                { text: "Persamaan sudut Brewster dirumuskan dengan tan θB = n2 / n1.", correct: true },
+                { text: "Pada sudut ini, seluruh energi sinar datang akan dipantulkan, tidak ada yang dibiaskan.", correct: false }
+            ] 
+        },
+        { 
+            question: "Di era modern, teknologi apa saja yang bekerja secara langsung memanfaatkan fenomena Optik Fisis gelombang cahaya?", 
+            options: [
+                { text: "Kacamata hitam anti-silau (Polarized Sunglasses) untuk meredam cahaya pantulan jalan.", correct: true },
+                { text: "Layar monitor LCD (Liquid Crystal Display) yang mengontrol perputaran polarisasi cahaya.", correct: true },
+                { text: "Pemeriksaan medis struktur janin menggunakan Ultrasonografi (USG).", correct: false },
+                { text: "Teknologi pembuatan citra tiga dimensi (Holografi) yang memanfaatkan prinsip interferensi.", correct: true }
+            ] 
+        },
+        { 
+            stimulus: "Teori fisika modern mengungkapkan konsep Dualisme Gelombang-Partikel.", 
+            question: "Manakah pernyataan yang BENAR mengenai sifat mendua (dualisme) dari cahaya?", 
+            options: [
+                { text: "Cahaya tidak hanya berupa gelombang kontinyu, tapi dapat dianggap sebagai paket-paket energi diskrit (Foton).", correct: true },
+                { text: "Gejala interferensi dan difraksi adalah fenomena yang hanya bisa dijelaskan jika cahaya adalah gelombang.", correct: true },
+                { text: "Fenomena Efek Fotolistrik (pelepasan elektron dari logam) membuktikan bahwa cahaya memiliki sifat partikel.", correct: true },
+                { text: "Sifat gelombang dari cahaya gagal dalam menjelaskan peristiwa pembiasan lensa.", correct: false }
+            ] 
+        },
+        { 
+            question: "Cahaya di ruang hampa merambat sebesar c ≈ 3 × 10⁸ m/s. Namun, saat cahaya masuk ke medium seperti air murni berindeks bias n=1,33, maka:", 
+            options: [
+                { text: "Kecepatan rambat cahaya dalam air (v) menjadi lebih kecil dari c.", correct: true },
+                { text: "Hubungan kecepatannya dapat dihitung dengan rumus v = c / n.", correct: true },
+                { text: "Frekuensi getaran cahaya (f) akan berubah menyesuaikan indeks bias air.", correct: false },
+                { text: "Panjang gelombang cahaya (λ) memendek dibanding ukurannya saat di udara.", correct: true }
+            ] 
+        },
+        { 
+            question: "Berdasarkan prinsip spektrum warna optik fisik, alasan sebuah benda seperti daun tampak berwarna HIJAU saat disinari matahari adalah:", 
+            options: [
+                { text: "Karena daun menyerap mayoritas cahaya hijau dan memantulkan warna merah dan biru.", correct: false },
+                { text: "Karena klorofil daun menyerap gelombang warna merah & biru, lalu memantulkan warna hijau ke mata kita.", correct: true },
+                { text: "Jika disinari dengan lampu berwarna murni merah di ruang gelap, daun tersebut akan tampak berwarna hitam.", correct: true },
+                { text: "Warna putih matahari adalah kombinasi dari seluruh spektrum warna tampak.", correct: true }
+            ] 
+        },
+        { 
+            stimulus: "Satu set perangkat percobaan interferensi Celah Ganda Young berada di udara. Kemudian, perangkat tersebut sepenuhnya dipindahkan (dicelupkan) ke dalam air yang jernih.", 
+            question: "Bagaimana perubahan pola interferensi pada layar setelah alat direndam di dalam air?", 
+            options: [
+                { text: "Jarak antar pita terang berdekatan akan menyempit (mengecil).", correct: true },
+                { text: "Panjang gelombang (λ) cahaya akan memendek saat di dalam air.", correct: true },
+                { text: "Frekuensi sumber cahaya mengalami penurunan.", correct: false },
+                { text: "Menurut rumus y = (L.λ) / d, berkurangnya λ mengakibatkan lebar (y) mengecil.", correct: true }
+            ] 
+        },
+        { 
+            question: "Dalam analisis superposisi dua gelombang cahaya, konsep 'Beda Lintasan' (Δx) sangat berhubungan dengan 'Beda Fase' (Δφ). Korelasi yang tepat adalah:", 
+            options: [
+                { text: "Beda lintasan sejauh 1 panjang gelombang (Δx = λ) setara dengan beda fase 360° atau 2π radian.", correct: true },
+                { text: "Beda lintasan sejauh setengah gelombang (Δx = ½ λ) akan selalu menghasilkan interferensi destruktif (gelap).", correct: true },
+                { text: "Kedua gelombang dikatakan sefase jika beda fasenya bernilai kelipatan ganjil dari π (1π, 3π, 5π).", correct: false },
+                { text: "Beda lintasan adalah selisih jarak tempuh geometri sinar cahaya pertama dan kedua menuju layar pengamat.", correct: true }
+            ] 
+        },
+        { 
+            question: "Dari daftar berikut, manakah kejadian fisika sehari-hari yang merupakan bukti fenomena Interferensi Gelombang Cahaya?", 
+            options: [
+                { text: "Warna biru langit siang hari.", correct: false },
+                { text: "Corak pita warna-warni (pelangi) yang menempel di lapisan atas CD atau DVD (kisi interferensi reflektif).", correct: true },
+                { text: "Warna-warni iridescence pada sayap serangga morpho dan bulu ekor burung merak (pewarnaan struktural).", correct: true },
+                { text: "Lingkaran terang gelap melingkar (Cincin Newton) jika kaca plan-konveks menempel di kaca datar.", correct: true }
+            ] 
+        },
+        { 
+            stimulus: "Efek Doppler tidak hanya terjadi pada bunyi, tetapi juga terjadi pada gelombang elektromagnetik/cahaya dalam skala astronomi relativistik.", 
+            question: "Pernyataan yang tepat mengenai Efek Doppler pada cahaya bintang adalah:", 
+            options: [
+                { text: "Digunakan astronom untuk mengetahui kecepatan dan arah gerak galaksi secara radial terhadap Bumi.", correct: true },
+                { text: "Pergeseran Merah (Redshift) terjadi saat spektrum cahaya bintang bergeser ke λ panjang, tanda bintang MENJAUHI kita.", correct: true },
+                { text: "Pergeseran Biru (Blueshift) menandakan bintang sedang bergerak MENDEKATI Bumi.", correct: true },
+                { text: "Bintang yang melaju menjauhi kita kecepatan rambat cahayanya akan melambat turun drastis di bawah nilai c.", correct: false }
+            ] 
+        },
+        { 
+            question: "Perbandingan sifat gelombang cahaya Monokromatik dan Polikromatik yang tepat adalah:", 
+            options: [
+                { text: "Sinar laser adalah representasi terbaik sumber cahaya monokromatik dan koheren di bumi.", correct: true },
+                { text: "Cahaya monokromatik artinya cahaya yang hanya memiliki frekuensi tunggal atau rentang panjang gelombang sangat sempit.", correct: true },
+                { text: "Cahaya putih dari matahari adalah cahaya monokromatik karena hanya memancarkan satu warna (putih).", correct: false },
+                { text: "Pada kisi difraksi, cahaya polikromatik akan dipisahkan menjadi komponen-komponen spektrum warnanya.", correct: true }
+            ] 
+        },
+        { 
+            stimulus: "Eksperimen Cincin Newton menghasilkan pola interferensi berupa lingkaran gelap-terang yang sepusat.", 
+            question: "Fakta-fakta fisis mengenai eksperimen Cincin Newton adalah:", 
+            options: [
+                { text: "Pola cincin diakibatkan oleh interferensi pemantulan lapisan udara tipis yang terbentuk di antara lensa plano-konveks dan kaca plan paralel.", correct: true },
+                { text: "Titik kontak terpusat antara lensa dan plat kaca akan selalu membentuk pusat gelap (interferensi destruktif).", correct: true },
+                { text: "Jari-jari lingkaran terang bergantung secara matematis pada panjang gelombang cahaya dan jari-jari kelengkungan lensa.", correct: true },
+                { text: "Eksperimen ini hanya bisa diamati menggunakan filter polarisasi saja.", correct: false }
+            ] 
+        },
+        { 
+            stimulus: "Pelangi primer di langit merupakan contoh keindahan fenomena optik alam yang melibatkan pembiasan dan dispersi oleh jutaan tetes air hujan.", 
+            question: "Penjabaran proses optik fisis terbentuknya pelangi yang TEPAT adalah:", 
+            options: [
+                { text: "Proses berurutan: Cahaya masuk tetes air dibiaskan, mengalami pemantulan internal, lalu dibiaskan keluar lagi.", correct: true },
+                { text: "Dispersi membuat setiap warna memantul dan membiaskan dengan sudut berbeda, menguraikan cahaya matahari putih.", correct: true },
+                { text: "Sudut deviasi warna ungu lebih besar (lebih berbelok) dibanding warna merah di dalam tetes air hujan.", correct: true },
+                { text: "Untuk melihat pelangi utuh, pengamat harus berdiri menghadap langsung ke arah terik matahari.", correct: false }
+            ] 
+        }
+    ];
+
+    // --- INISIALISASI ---
+    document.addEventListener('DOMContentLoaded', fetchLeaderboard);
+
+    function startQuiz() {
+        playerName = document.getElementById('player-name').value.trim();
+        playerSchool = document.getElementById('player-school').value.trim();
+        
+        const errorMsg = document.getElementById('error-msg');
+        if(!playerName || !playerSchool) {
+            errorMsg.style.display = "block";
+            return;
+        }
+        errorMsg.style.display = "none";
+
+        document.getElementById('display-name').innerText = playerName;
+        gameStartTime = new Date(); // Catat waktu mulai
+        
+        // Acak bank soal, potong sejumlah TOTAL_QUESTIONS
+        selectedQuestions = [...GAME_QUESTION_BANK].sort(() => 0.5 - Math.random()).slice(0, TOTAL_QUESTIONS);
+        renderQuestions();
+        
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('quiz-area').style.display = 'block';
+        showQuestion(0);
+    }
+
+    function renderQuestions() {
+        const container = document.getElementById('questions-container');
+        container.innerHTML = '';
+        selectedQuestions.forEach((q, i) => {
+            const div = document.createElement('div');
+            div.className = 'question-card';
+            div.id = `q-${i}`;
+            div.innerHTML = `
+                ${q.stimulus ? `<div class="stimulus-box">${q.stimulus}</div>` : ''}
+                <div class="question-text">${i+1}. ${q.question}</div>
+                <div class="options-grid">
+                    ${q.options.map((opt, oi) => `
+                        <label class="option-label">
+                            <input type="checkbox" class="option-input" name="q${i}" value="${oi}">
+                            ${opt.text}
+                        </label>
+                    `).join('')}
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function showQuestion(index) {
+        clearInterval(timerId);
+        document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
+        document.getElementById(`q-${index}`).classList.add('active');
+        currentIdx = index;
+        document.getElementById('current-q').innerText = index + 1;
+        
+        let timeLeft = TIME_LIMIT;
+        const timerEl = document.getElementById('timer-value');
+        timerEl.innerText = timeLeft;
+        timerEl.parentElement.classList.remove('low-time');
+        
+        timerId = setInterval(() => {
+            timeLeft--;
+            timerEl.innerText = timeLeft;
+            if(timeLeft <= 10) timerEl.parentElement.classList.add('low-time');
+            if(timeLeft <= 0) nextQuestion();
+        }, 1000);
+    }
+
+    function nextQuestion() {
+        saveAnswer();
+        if(currentIdx < TOTAL_QUESTIONS - 1) {
+            showQuestion(currentIdx + 1);
+        } else {
+            finishQuiz();
+        }
+    }
+
+    function saveAnswer() {
+        const inputs = document.querySelectorAll(`#q-${currentIdx} input:checked`);
+        userAnswers[currentIdx] = Array.from(inputs).map(i => parseInt(i.value));
+    }
+
+    async function finishQuiz() {
+        clearInterval(timerId);
+        let totalScore = 0;
+
+        selectedQuestions.forEach((q, i) => {
+            const userAns = userAnswers[i] || [];
+            const correctIndices = q.options.map((o, idx) => o.correct ? idx : -1).filter(idx => idx !== -1);
+            
+            // Penilaian Parsial: Jika benar + poin, jika salah - poin
+            let correctCount = 0;
+            userAns.forEach(val => {
+                if(correctIndices.includes(val)) correctCount++;
+                else correctCount--; // Penalti jika salah pilih
+            });
+            
+            if(correctCount > 0) {
+                totalScore += (correctCount / correctIndices.length) * (100 / TOTAL_QUESTIONS);
+            }
+        });
+
+        // Maksimal 100 poin
+        const finalScore = Math.max(0, Math.round(totalScore));
+        document.getElementById('final-score').innerText = finalScore;
+        
+        let msg = "Terus asah insting optikmu!";
+        if(finalScore >= 80) msg = "Brilian! Pemahaman optikmu seterang kecepatan cahaya.";
+        else if (finalScore >= 60) msg = "Bagus! Kamu bisa melihat spektrum fisika ini dengan cukup jelas.";
+        document.getElementById('result-message').innerText = msg;
+
+        // Beralih layar
+        document.getElementById('quiz-area').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'block';
+
+        // Hitung Waktu dan Simpan Data
+        const timeTaken = Math.floor((new Date() - gameStartTime) / 1000);
+        await saveScoreCloud(finalScore, timeTaken);
+    }
+
+    // --- FITUR DATABASE & CLOUD ---
+    async function saveScoreCloud(score, timeTaken) {
+        const statusEl = document.getElementById('save-status');
+        statusEl.innerText = "Mengirim sinyal cahaya ke server satelit...";
+        statusEl.style.color = "var(--accent-purple)";
+
+        const payload = {
+            playerName: playerName,
+            playerSchool: playerSchool,
+            score: score,
+            level: "Kompleks", 
+            gameTopic: "Gelombang Cahaya", // Diperbarui sesuai sub-topik "Gelombang Cahaya"
+            timeTakenSec: timeTaken,
+            gameType: "Pilihan Ganda Kompleks",
+            game_id: "pgk_gelombang_cahaya_1" // Diperbarui ID unik
+        };
+
+        try {
+            const response = await fetch(APP_SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+            
+            if(result.status === 'success') {
+                statusEl.innerText = "✅ Rekam jejak berhasil disimpan di Database Global!";
+                statusEl.style.color = "var(--accent-green)";
+            } else {
+                throw new Error(result.message);
+            }
+        } catch(err) {
+            console.error("Gagal simpan:", err);
+            statusEl.innerText = "⚠️ Gangguan transmisi: Gagal menyimpan skor ke server.";
+            statusEl.style.color = "var(--accent-red)";
+        }
+    }
+
+    async function fetchLeaderboard() {
+        const tbody = document.getElementById('leaderboard-body');
+        try {
+            const response = await fetch(APP_SCRIPT_URL);
+            const result = await response.json();
+            
+            if(result.status === 'success' && result.data.length > 0) {
+                // Filter game terkait: Topik "Gelombang Cahaya"
+                let filteredData = result.data.filter(item => item.gameType === "Pilihan Ganda Kompleks" && item.gameTopic === "Gelombang Cahaya");
+                
+                // Urutkan: Skor tertinggi -> Waktu tercepat
+                filteredData.sort((a, b) => {
+                    if (b.score !== a.score) return b.score - a.score;
+                    return (a.timeTakenSec || 0) - (b.timeTakenSec || 0);
+                });
+
+                filteredData = filteredData.slice(0, 5); // Ambil Top 5
+                
+                if(filteredData.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#94a3b8; padding: 1.5rem;">Belum ada pemain yang memancarkan skor di papan ini.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = filteredData.map((entry, idx) => `
+                    <tr style="${idx === 0 ? 'font-weight:bold; background:rgba(139,92,246,0.15); border-left: 3px solid var(--accent-purple);' : ''}">
+                        <td>#${idx + 1}</td>
+                        <td>${entry.playerName || 'Anonim'}<br><small style="color:#94a3b8">${entry.playerSchool || '-'}</small></td>
+                        <td style="color:var(--accent-blue); font-weight:bold; font-size: 1.1rem;">${entry.score || 0}</td>
+                    </tr>
+                `).join('');
+            } else {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#94a3b8;">Database masih kosong.</td></tr>';
+            }
+        } catch (e) {
+            console.error(e);
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--accent-red);">Gagal memuat papan peringkat optik.</td></tr>';
+        }
+    }
+</script>
+</body>
+</html>
