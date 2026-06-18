@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Cepat Fisika: Gelombang Cahaya</title>
+    <style>
+        :root {
+            /* Tema Warna Elastisitas/Getaran (Teal, Oranye, Hijau) sesuai permintaan */
+            --main-bg-color: #e0f2f1;
+            --container-bg: #ffffff;
+            --text-color: #263238;
+            --title-color: #00796b;
+            --primary-button-bg: #f57c00;
+            --primary-button-hover: #e65100;
+            --success-button-bg: #43a047;
+            --success-button-hover: #2e7d32;
+            --border-color: #b2dfdb;
+            --correct-color: #2e7d32;
+            --incorrect-color: #c62828;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background-color: var(--main-bg-color); color: var(--text-color); }
+        #game-container { width: 90%; max-width: 600px; background: var(--container-bg); padding: 20px 30px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); text-align: center; display: flex; flex-direction: column; justify-content: center; }
+        h1 { color: var(--title-color); }
+        #start-screen p { font-size: 1.1em; margin: 15px 0 25px 0; }
+        .input-group { max-width: 450px; margin: 0 auto 1.5em auto; text-align: left; }
+        .input-group label { display: block; margin-bottom: 0.5em; font-weight: 600; color: #4a5568; }
+        .input-group input { width: 100%; padding: 0.75em; font-size: 1em; border: 2px solid var(--border-color); border-radius: 8px; box-sizing: border-box; }
+        .level-selection { max-width: 450px; margin: 2em auto; text-align: center; }
+        .level-selection h4 { margin-bottom: 1em; color: #4a5568; font-weight: 500; }
+        .level-options { display: flex; justify-content: center; gap: 1em; flex-wrap: wrap; }
+        .level-options input[type="radio"] { display: none; }
+        .level-options label { padding: 0.8em 1.5em; border: 2px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: all 0.2s ease; font-weight: 600; }
+        .level-options input[type="radio"]:checked + label { background-color: var(--primary-button-bg); color: white; border-color: var(--primary-button-bg); }
+        #start-btn { background-color: var(--success-button-bg); color: white; padding: 15px 30px; font-size: 1.2em; border-radius: 8px; cursor: pointer; border: none; transition: background-color 0.3s, opacity 0.3s; margin-top: 10px;}
+        #start-btn:hover:not(:disabled) { background-color: var(--success-button-hover); }
+        #start-error { color: var(--incorrect-color); font-weight: bold; min-height: 24px; margin-bottom: 10px;}
+        #game-content { display: none; }
+        #player-info-display { background-color: #e2e8f0; padding: 0.75em 1em; border-radius: 6px; margin-bottom: 1em; font-size: 0.9em; border-left: 4px solid var(--title-color); word-wrap: break-word; text-align: left; }
+        #chances-display { font-size: 1.2em; letter-spacing: 2px; }
+        #game-arena { display: flex; justify-content: space-around; align-items: flex-end; height: 350px; margin-top: 20px; padding-bottom: 20px; border: 2px solid var(--border-color); border-bottom: 10px solid #a0aec0; border-radius: 5px; padding-top: 30px; box-sizing: border-box; }
+        .flagpole { position: relative; width: 15px; height: 100%; background-color: #c0c0c0; border: 2px solid #808080; border-radius: 5px 5px 0 0; }
+        .flagpole::before { content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 30px; height: 30px; background-color: #ffd700; border-radius: 50%; border: 2px solid #b8860b; }
+        .flag { position: absolute; bottom: 10px; left: 15px; width: 50px; height: 30px; border: 1px solid #333; box-sizing: border-box; transition: bottom 0.1s linear; }
+        #player-flag { background: linear-gradient(to bottom, red 50%, white 50%); }
+        #opponent-flag { background: linear-gradient(to bottom, white 50%, red 50%); }
+        .controls { margin-top: 20px; }
+        #question-area { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px; font-size: 1.2em; margin-bottom: 10px; }
+        #question { font-weight: bold; min-height: 50px; }
+        .input-wrapper { display: flex; align-items: center; gap: 10px; }
+        #answer-input { width: 80px; padding: 8px; font-size: 1em; text-align: center; border: 2px solid #ccc; border-radius: 5px; }
+        button { font-size: 16px; font-weight: bold; cursor: pointer; border: none; border-radius: 5px; color: white; transition: background-color 0.3s; }
+        #submit-btn { background-color: var(--success-button-bg); padding: 10px 20px; }
+        #submit-btn:hover { background-color: var(--success-button-hover); }
+        #submit-btn:disabled { background-color: #a0d8ac; cursor: not-allowed; }
+        #reset-btn { background-color: var(--primary-button-bg); padding: 10px 20px; }
+        #reset-btn:hover { background-color: var(--primary-button-hover); }
+        #message { margin-top: 15px; font-size: 18px; font-weight: bold; min-height: 48px; line-height: 1.4; }
+        #feedback { min-height: 22px; font-style: italic; margin-top: 5px; }
+        .correct { color: var(--correct-color); }
+        .incorrect { color: var(--incorrect-color); }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="start-screen">
+            <h1>Kuis Cepat Fisika: Gelombang Cahaya</h1>
+            <p>Selesaikan 10 soal perhitungan Interferensi, Difraksi, Polarisasi, Refraksi, Refleksi, & Dispersi untuk menaikkan benderamu ke puncak tiang!</p>
+            <div class="input-group"><label for="player-name">Nama Pemain:</label><input type="text" id="player-name" placeholder="Masukkan nama Anda"></div>
+            <div class="input-group"><label for="player-school">Sekolah/Instansi:</label><input type="text" id="player-school" placeholder="Masukkan sekolah/instansi Anda"></div>
+            <div class="level-selection">
+                <h4>Pilih Tingkat Kesulitan:</h4>
+                <div class="level-options">
+                    <input type="radio" id="level-pemula" name="level" value="pemula"><label for="level-pemula">Mudah</label>
+                    <input type="radio" id="level-normal" name="level" value="normal" checked><label for="level-normal">Normal</label>
+                    <input type="radio" id="level-mahir" name="level" value="mahir"><label for="level-mahir">Sulit</label>
+                </div>
+            </div>
+            <p id="start-error"></p>
+            <button id="start-btn">Mulai Kuis</button>
+        </div>
+        <div id="game-content">
+            <div id="player-info-display"></div>
+            <p>Jawab 10 soal dengan benar untuk melakukan sprint terakhir menuju puncak!</p>
+            <div id="game-arena">
+                <div class="flagpole"><div id="player-flag" class="flag"></div></div>
+                <div class="flagpole"><div id="opponent-flag" class="flag"></div></div>
+            </div>
+            <div class="controls">
+                <div id="question-area">
+                    <p id="question"></p>
+                    <div class="input-wrapper"><input type="number" id="answer-input" autofocus><button id="submit-btn">Jawab</button></div>
+                </div>
+                <button id="reset-btn">Ulangi</button>
+                <p id="feedback"></p>
+            </div>
+            <p id="message"></p>
+        </div>
+    </div>
+
+<script>
+    // --- KONFIGURASI APP SCRIPT URL ---
+    const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxITf_H2zjlqPnpZeRTAicug0gCvLHXolLHzxq_oP6awd-481tXR-6CPXzcbbwF7OIc/exec'; 
+
+    const startScreen = document.getElementById('start-screen');
+    const startBtn = document.getElementById('start-btn');
+    const startError = document.getElementById('start-error');
+    const gameContent = document.getElementById('game-content');
+    const playerFlag = document.getElementById('player-flag');
+    const opponentFlag = document.getElementById('opponent-flag');
+    const message = document.getElementById('message');
+    const flagpole = document.querySelector('.flagpole');
+    const questionEl = document.getElementById('question');
+    const answerInput = document.getElementById('answer-input');
+    const submitBtn = document.getElementById('submit-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const feedbackEl = document.getElementById('feedback');
+    const playerNameInput = document.getElementById('player-name');
+    const playerSchoolInput = document.getElementById('player-school');
+    const playerInfoDisplay = document.getElementById('player-info-display');
+
+    // Waktu diubah sesuai spesifikasi: 900s, 600s, 300s
+    const levelConfig = { pemula: { duration: 900*1000, name: 'Mudah' }, normal: { duration: 600*1000, name: 'Normal' }, mahir:  { duration: 300*1000, name: 'Sulit' } };
+    let currentGameDurationMs;
+
+    let playerPosition, opponentPosition, playerSpeed, opponentSpeed;
+    const INITIAL_PLAYER_SPEED_FACTOR = 0.5, FINAL_SPRINT_MULTIPLIER = 2.5;
+    const WIN_CONDITION_ANSWERS = 10;
+    let gameFinished = false, gameLoop, correctAnswer, correctAnswersCount = 0;
+    let playerName = '', playerSchool = '', currentLevelName = '';
+    let gameStartTime;
+
+    const MAX_WRONG_ANSWERS = 2;
+    let wrongAnswersCount = 0;
+    let chancesDisplay;
+    let playerHasLostChances = false;
+
+    // --- FUNGSI INTI PERMAINAN ---
+
+    async function submitScoreToDatabase() {
+        if (!playerName || !playerSchool) { return; }
+        
+        message.innerHTML = "Menyimpan data skor ke Spreadsheet... ⏳";
+        message.style.color = "var(--text-color)";
+
+        const finalScore = Math.round((correctAnswersCount / WIN_CONDITION_ANSWERS) * 100);
+
+        try {
+            const endTime = new Date();
+            const durationInSeconds = Math.round((endTime - gameStartTime) / 1000);
+            const scoreData = {
+                playerName: playerName, 
+                playerSchool: playerSchool, 
+                score: finalScore,
+                level: currentLevelName, 
+                gameTopic: "Gelombang Cahaya", 
+                timeTakenSeconds: durationInSeconds,
+                gameType: "Kuis Hitungan" 
+            };
+
+            const response = await fetch(APP_SCRIPT_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8',
+                },
+                body: JSON.stringify(scoreData)
+            });
+
+            if (!response.ok) {
+                throw new Error("Gagal terhubung ke server.");
+            }
+
+            message.innerHTML = `🎉 Permainan Selesai!<br>Skor Anda: ${scoreData.score}<br>Data berhasil disimpan di Spreadsheet!`;
+            message.style.color = "var(--correct-color)";
+
+        } catch (error) {
+            console.error("Error saat menyimpan skor:", error.message);
+            message.innerHTML = `⚠️ Permainan Selesai (Skor: ${finalScore}).<br>Namun, terjadi kesalahan saat menyimpan skor. Pastikan URL App Script benar.`;
+            message.style.color = "var(--incorrect-color)";
+        }
+    }
+    
+    function updateChancesDisplay() {
+        if (!chancesDisplay) return;
+        const chancesLeft = MAX_WRONG_ANSWERS - wrongAnswersCount;
+        chancesDisplay.textContent = '❤️'.repeat(chancesLeft) + '🤍'.repeat(MAX_WRONG_ANSWERS - chancesLeft);
+    }
+
+    function generateQuestion() {
+        let typeRand = Math.floor(Math.random() * 9);
+        let questionText = "";
+        
+        if (typeRand === 0) { // Refleksi 1
+            let theta = Math.floor(Math.random() * 50) + 15; // 15..64
+            correctAnswer = theta;
+            questionText = `Sinar cahaya jatuh pada cermin datar dengan sudut datang ${theta}°. Berapa sudut pantulnya? (°)`;
+        } else if (typeRand === 1) { // Refleksi 2
+            let theta = (Math.floor(Math.random() * 30) + 10) * 2; // 20..78 (Genap)
+            correctAnswer = theta / 2;
+            questionText = `Sudut antara sinar datang dan sinar pantul pada cermin datar adalah ${theta}°. Berapa besar sudut datangnya? (°)`;
+        } else if (typeRand === 2) { // Refraksi
+            let opts = [{n: "1.5", ans: 20}, {n: "3.0", ans: 10}, {n: "1.2", ans: 25}, {n: "2.5", ans: 12}];
+            let chosen = opts[Math.floor(Math.random() * opts.length)];
+            correctAnswer = chosen.ans;
+            questionText = `Indeks bias kaca n = ${chosen.n}. Jika c = 3x10⁸ m/s, kecepatan cahaya dalam kaca tersebut adalah ... x10⁷ m/s. (tulis angkanya saja)`;
+        } else if (typeRand === 3) { // Interferensi Young
+            let n = Math.floor(Math.random() * 4) + 2; // 2..5
+            correctAnswer = n;
+            questionText = `Pada interferensi celah ganda, layar dijauhkan menjadi ${n} kali lipat semula. Jarak antar pita terang bertambah menjadi ... kali lipat semula.`;
+        } else if (typeRand === 4) { // Polarisasi 1
+            correctAnswer = 50;
+            questionText = `Cahaya alami (tak terpolarisasi) dilewatkan pada polarisator ideal. Berapa persentase intensitas cahaya yang berhasil diteruskan? (%)`;
+        } else if (typeRand === 5) { // Polarisasi (Hukum Malus)
+            let opts = [{a: 0, ans: 100}, {a: 30, ans: 75}, {a: 45, ans: 50}, {a: 60, ans: 25}];
+            let chosen = opts[Math.floor(Math.random() * opts.length)];
+            correctAnswer = chosen.ans;
+            questionText = `Cahaya terpolarisasi melewati analisator bersudut ${chosen.a}°. Sesuai Hukum Malus, berapa persentase intensitas cahaya yang diteruskan? (%)`;
+        } else if (typeRand === 6) { // Dispersi Prisma
+            let m = Math.floor(Math.random() * 4) + 3; // 3..6
+            let u = m + Math.floor(Math.random() * 3) + 1; // m+1 .. m+3
+            correctAnswer = u - m;
+            questionText = `Deviasi sinar ungu pada prisma sebesar ${u}° dan deviasi sinar merah ${m}°. Berapakah besar sudut dispersi prisma tersebut? (°)`;
+        } else if (typeRand === 7) { // Difraksi Kisi
+            let opts = [{N: 1000, ans: 1000}, {N: 500, ans: 2000}, {N: 250, ans: 4000}, {N: 200, ans: 5000}, {N: 100, ans: 10000}];
+            let chosen = opts[Math.floor(Math.random() * opts.length)];
+            correctAnswer = chosen.ans;
+            questionText = `Sebuah kisi difraksi memiliki ${chosen.N} garis/mm. Berapakah jarak antar celah (d) kisi tersebut dalam satuan nanometer (nm)?`;
+        } else if (typeRand === 8) { // Panjang Gelombang / Frekuensi
+            let opts = [{f: "5", ans: 600}, {f: "6", ans: 500}, {f: "7.5", ans: 400}, {f: "10", ans: 300}];
+            let chosen = opts[Math.floor(Math.random() * opts.length)];
+            correctAnswer = chosen.ans;
+            questionText = `Frekuensi seberkas cahaya adalah ${chosen.f}x10¹⁴ Hz. Jika c = 3x10⁸ m/s, berapakah panjang gelombangnya? (dalam nm)`;
+        }
+        
+        questionEl.textContent = questionText;
+    }
+
+    function checkAnswer() {
+        if (gameFinished) return;
+        const userAnswer = parseInt(answerInput.value);
+        if (isNaN(userAnswer)) return;
+
+        if (userAnswer === correctAnswer) {
+            correctAnswersCount++;
+            feedbackEl.className = 'correct';
+            if (correctAnswersCount >= WIN_CONDITION_ANSWERS) {
+                feedbackEl.textContent = "Jawaban terakhir benar! Dorongan akhir diaktifkan!";
+                playerSpeed = opponentSpeed * FINAL_SPRINT_MULTIPLIER;
+                submitBtn.disabled = true; answerInput.disabled = true;
+            } else {
+                feedbackEl.textContent = `Benar! (${correctAnswersCount}/${WIN_CONDITION_ANSWERS}) Percepatanmu bertambah!`;
+                playerSpeed = opponentSpeed * (INITIAL_PLAYER_SPEED_FACTOR + (correctAnswersCount * 0.1));
+                generateQuestion();
+            }
+        } else { 
+            wrongAnswersCount++;
+            updateChancesDisplay();
+            feedbackEl.className = 'incorrect';
+            submitBtn.disabled = true;
+
+            if (wrongAnswersCount >= MAX_WRONG_ANSWERS) {
+                playerHasLostChances = true;
+                feedbackEl.textContent = "Salah! Kesempatan habis, kecepatanmu melambat!";
+                playerSpeed = opponentSpeed * 0.1; 
+                setTimeout(() => { generateQuestion(); submitBtn.disabled = false; answerInput.focus(); }, 2000);
+            } else {
+                feedbackEl.textContent = "Salah! Coba soal berikutnya...";
+                setTimeout(() => { generateQuestion(); feedbackEl.textContent = ""; submitBtn.disabled = false; answerInput.focus(); }, 1200);
+            }
+        }
+        answerInput.value = '';
+        if (!gameFinished) { answerInput.focus(); }
+    }
+    
+    function updateGame() { 
+        if (gameFinished) return; 
+        playerPosition += playerSpeed; 
+        opponentPosition += opponentSpeed; 
+        playerFlag.style.bottom = playerPosition + 'px'; 
+        opponentFlag.style.bottom = opponentPosition + 'px'; 
+        checkWinCondition(); 
+    }
+    
+    function checkWinCondition() {
+        const finishPosition = flagpole.offsetHeight - playerFlag.offsetHeight;
+        if (playerPosition >= finishPosition && correctAnswersCount >= WIN_CONDITION_ANSWERS && !playerHasLostChances) {
+            endGame("win");
+        } else if (opponentPosition >= finishPosition) {
+            endGame("lose");
+        }
+    }
+
+    function endGame(result) { 
+        gameFinished = true; 
+        clearInterval(gameLoop); 
+        submitBtn.disabled = true; 
+        answerInput.disabled = true; 
+        
+        if (result === "win") {
+            message.textContent = "FINIS! Benderamu mencapai puncak! 🎉 Menyimpan data...";
+            message.style.color = 'var(--correct-color)';
+        } else {
+            if (playerHasLostChances) { message.textContent = "Kalah! Terlalu banyak kesalahan. Menyimpan data..."; } 
+            else { message.textContent = "Waktu Habis! Lawan mencapai puncak lebih dulu. Menyimpan data..."; }
+            message.style.color = 'var(--incorrect-color)';
+        }
+
+        submitScoreToDatabase(); 
+    }
+    
+    function initGame() {
+        gameStartTime = new Date();
+        wrongAnswersCount = 0; playerHasLostChances = false;
+        playerInfoDisplay.innerHTML = `<span><b>Pemain:</b> ${playerName} | <b>Sekolah:</b> ${playerSchool} | <b>Level:</b> ${currentLevelName}</span><span style="float: right;"><b>Kesempatan:</b> <span id="chances-display"></span></span>`;
+        chancesDisplay = document.getElementById('chances-display');
+        updateChancesDisplay();
+        playerPosition = 10; opponentPosition = 10;
+        playerFlag.style.bottom = '10px'; opponentFlag.style.bottom = '10px';
+        correctAnswersCount = 0;
+        const gameDurationMs = currentGameDurationMs; 
+        const finishPosition = flagpole.offsetHeight - opponentFlag.offsetHeight;
+        const travelDistance = finishPosition - opponentPosition;
+        const updateIntervalMs = 16;
+        opponentSpeed = travelDistance / (gameDurationMs / updateIntervalMs);
+        playerSpeed = opponentSpeed * INITIAL_PLAYER_SPEED_FACTOR;
+        gameFinished = false;
+        message.textContent = ""; feedbackEl.textContent = "";
+        submitBtn.disabled = false; answerInput.disabled = false;
+        answerInput.value = '';
+        generateQuestion();
+        clearInterval(gameLoop);
+        gameLoop = setInterval(updateGame, updateIntervalMs);
+        answerInput.focus();
+    }
+
+    // --- EVENT LISTENERS ---
+    startBtn.addEventListener('click', () => { 
+        playerName = playerNameInput.value.trim(); 
+        playerSchool = playerSchoolInput.value.trim(); 
+        startError.textContent = "";
+
+        if (!playerName || !playerSchool) { 
+            startError.textContent = "Harap isi Nama dan Sekolah/Instansi!";
+            return; 
+        } 
+        const selectedLevel = document.querySelector('input[name="level"]:checked').value; 
+        currentGameDurationMs = levelConfig[selectedLevel].duration; 
+        currentLevelName = levelConfig[selectedLevel].name; 
+        startScreen.style.display = 'none'; 
+        gameContent.style.display = 'block'; 
+        initGame(); 
+    });
+    
+    submitBtn.addEventListener('click', checkAnswer);
+    resetBtn.addEventListener('click', initGame);
+    answerInput.addEventListener('keydown', (event) => { if (event.key === 'Enter' && !submitBtn.disabled) { checkAnswer(); } });
+</script>
+</body>
+</html>
